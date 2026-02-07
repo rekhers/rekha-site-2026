@@ -160,11 +160,8 @@ export default function Home() {
       >
         <h2 className="text-xl font-semibold tracking-tight">About</h2>
         <p className="mt-4 text-base leading-7 text-zinc-700 dark:text-zinc-300">
-          Senior creative technologist focused on interactive and experimental
-          storytelling. Previously part of The Lede Lab at The Washington Post
-          and an editorial interactives developer at The New Yorker, where she
-          contributed to award-winning immersive projects. BA in linguistics,
-          University of Massachusetts Amherst.
+          Senior Creative Technologist with work at The Washington Post, The
+          New Yorker, and The Atlantic.
         </p>
 
         <h3 className="mt-10 text-lg font-semibold tracking-tight">Projects</h3>
