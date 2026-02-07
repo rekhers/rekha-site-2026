@@ -51,8 +51,7 @@ body {
   text-decoration: none;
   color: yellow;
 } */
-.title:hover,
-.title:active {
+.title:hover {
   text-decoration: none;
   color: white;
 }
