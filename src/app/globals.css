@@ -26,34 +26,64 @@
 }
 
 body {
-  background: black;
+  background: #f7f1ec;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
+    radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+  background-size: 120px 120px, 160px 160px;
+  background-position: 0 0, 40px 60px;
+  opacity: 0.18;
+  mix-blend-mode: soft-light;
+  animation: grain-drift 14s steps(6) infinite;
+}
+
+@keyframes grain-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-1%, 1%, 0);
+  }
+  100% {
+    transform: translate3d(1%, -1%, 0);
+  }
+}
+
+html,
+body {
+  scroll-behavior: smooth;
+}
+
 .title {
   font-size: 72px;
+  color: #4a274f;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
 }
 
 .title:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  color: #4a274f;
+}
+
+.title:hover {
+  text-shadow:
+    0 0 6px rgba(164, 102, 203, 0.35),
+    0 0 16px rgba(94, 219, 200, 0.25);
 }
 
 .title:visited {
   text-decoration: none;
-  color: red;
-}
-/* .title:hover {
-  text-decoration: none;
-  color: blue;
-}
-.title:focus {
-  text-decoration: none;
-  color: yellow;
-} */
-.title:hover {
-  text-decoration: none;
-  color: white;
+  color: #4a274f;
 }
 
 .subhed:hover {
@@ -74,4 +104,108 @@ body {
   height: 70vh;
   justify-content: space-around;
   margin: 0 auto;
+}
+
+.seal-link {
+  width: 84px;
+  height: 84px;
+}
+
+.seal-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 6px;
+}
+
+.seal-outer,
+.seal-inner {
+  position: absolute;
+  border-radius: 999px;
+  border: 2.5px solid rgba(24, 24, 27, 0.85);
+  transition: border-color 220ms ease, transform 220ms ease;
+}
+
+.seal-outer {
+  width: 84px;
+  height: 84px;
+  animation: seal-pulse 4s ease-in-out infinite;
+}
+
+.seal-inner {
+  width: 54px;
+  height: 54px;
+  border-width: 2px;
+  animation: seal-squish 4s ease-in-out infinite;
+}
+
+.seal-bar {
+  position: absolute;
+  width: 46px;
+  height: 2px;
+  background: rgba(24, 24, 27, 0.9);
+  border-radius: 999px;
+  animation: seal-bar 4s ease-in-out infinite;
+}
+
+.seal-arrow {
+  position: relative;
+  font-size: 20px;
+  line-height: 1;
+  animation: seal-float 4s ease-in-out infinite;
+}
+
+.seal-link:hover .seal-outer,
+.seal-link:hover .seal-inner {
+  border-color: rgba(9, 9, 11, 1);
+  transform: scale(1.02);
+}
+
+.seal-link:hover .seal-bar {
+  background: rgba(120, 255, 238, 0.9);
+  box-shadow: 0 0 10px rgba(120, 255, 238, 0.6);
+}
+
+.seal-link:hover .seal-arrow {
+  color: rgba(120, 255, 238, 0.95);
+  text-shadow: 0 0 10px rgba(120, 255, 238, 0.6);
+}
+
+
+@keyframes seal-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes seal-squish {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(1.08);
+  }
+}
+
+@keyframes seal-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes seal-bar {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(1.25);
+  }
 }
