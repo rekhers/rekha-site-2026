@@ -17,6 +17,10 @@
 /.next/
 /out/
 
+# deploy artifacts / large assets
+/rekha-site.tar.gz
+/public/models/
+
 # production
 /build
 
