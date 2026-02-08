@@ -3,6 +3,13 @@ export default function AboutPage() {
     <div>
       <h1>About</h1>
       <p>This is the about page</p>
+      <p>
+        Explore experiments{" "}
+        <a href="/experiments" className="underline">
+          here
+        </a>
+        .
+      </p>
     </div>
   );
 }

@@ -45,12 +45,21 @@ export const metadata = {
     description:
       "Creative technologist and journalist crafting interactive stories at The Washington Post’s R&D Lab.",
     siteName: "Rekha Tenjarla",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Rekha Tenjarla",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Rekha Tenjarla",
     description:
       "Creative technologist and journalist crafting interactive stories at The Washington Post’s R&D Lab.",
+    images: ["/og.png"],
   },
 };
 

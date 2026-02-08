@@ -1,6 +1,6 @@
 #!/bin/bash
 # -----------------------------
-# Deploy script for rekha-site
+# Reliable deploy script for rekha-site
 # -----------------------------
 
 # ---------- CONFIG ----------
@@ -9,11 +9,16 @@ REMOTE_USER="rekhers"
 REMOTE_HOST="160.153.190.72"
 REMOTE_DIR="/home/$REMOTE_USER/$APP_NAME"
 LOCAL_DIR="."                       # current folder
-TAR_NAME="../$APP_NAME.tar.gz"      # create tarball outside folder to avoid self-archive
+TAR_NAME="rekha-site.tar.gz"
+TAR_PATH="/tmp/$TAR_NAME"
 
 # ---------- BUILD ----------
 echo "🔧 Installing dependencies..."
-npm install
+if [ ! -d "node_modules" ]; then
+  npm install
+else
+  echo "✅ node_modules already present — skipping npm install"
+fi
 
 echo "🏗️ Building production version..."
 npm run build
@@ -23,23 +28,33 @@ echo "🧹 Cleaning macOS metadata files..."
 find $LOCAL_DIR -name "._*" -delete
 find $LOCAL_DIR -name ".DS_Store" -delete
 
-# ---------- PACKAGE ----------
-echo "📦 Creating tarball outside the folder..."
-rm -f $TAR_NAME   # remove old tarball if it exists
-tar -czf $TAR_NAME -C $LOCAL_DIR .
-
 # ---------- COPY TO SERVER ----------
-echo "🚀 Copying tarball to server..."
-scp $TAR_NAME $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
+echo "🚀 Syncing project files to server..."
+rsync -avz --delete --progress \
+  --exclude node_modules \
+  --exclude .next \
+  --exclude .git \
+  --exclude ".DS_Store" \
+  --exclude "rekha-site.tar.gz" \
+  package.json package-lock.json next.config.mjs \
+  public src \
+  $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
 
 # ---------- DEPLOY ON SERVER ----------
 echo "💻 Deploying on VPS..."
 ssh $REMOTE_USER@$REMOTE_HOST << EOF
   set -e
   cd $REMOTE_DIR
-  echo "📂 Extracting files..."
-  tar -xzf $TAR_NAME --strip-components=1
-  echo "🛑 Stopping old PM2 process..."
-  pm2 stop $APP_NAME || true
-  pm2 delete $APP_NAME || true
-  echo "▶️ Starting new PM2 pr
+  echo "📦 Installing dependencies on server..."
+  npm install
+  echo "🏗️ Building production version on server..."
+  npm run build
+  echo "🧹 Cleaning PM2 process..."
+  pm2 delete "$APP_NAME" || true
+  echo "▶️ Starting PM2 process..."
+  pm2 start npm --name "$APP_NAME" -- run start
+  pm2 save
+  echo "📋 PM2 status:"
+  pm2 list
+  echo "✅ Deployment complete!"
+EOF

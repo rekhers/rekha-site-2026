@@ -163,6 +163,13 @@ export default function Home() {
           Senior Creative Technologist with work at The Washington Post, The
           New Yorker, and The Atlantic.
         </p>
+        <p className="mt-3 text-base leading-7 text-zinc-700 dark:text-zinc-300">
+          See my experiments{" "}
+          <a href="/experiments" className="underline">
+            here
+          </a>
+          .
+        </p>
 
         <h3 className="mt-10 text-lg font-semibold tracking-tight">Projects</h3>
         <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
