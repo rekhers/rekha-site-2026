@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { Playfair_Display } from "next/font/google";
 
@@ -14,8 +14,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const pixelFont = Press_Start_2P({
+  variable: "--font-pixel",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata = {
   metadataBase: new URL("https://www.rekhatenjarla.com"),
+  colorScheme: "light",
   title: {
     default: "Rekha Tenjarla",
     template: "%s | Rekha Tenjarla",
@@ -43,7 +50,7 @@ export const metadata = {
     url: "https://www.rekhatenjarla.com",
     title: "Rekha Tenjarla",
     description:
-      "Creative technologist and journalist crafting interactive stories at The Washington Post’s R&D Lab.",
+      "Creative technologist and journalist building stories and interactive tools",
     siteName: "Rekha Tenjarla",
     images: [
       {
@@ -58,15 +65,21 @@ export const metadata = {
     card: "summary_large_image",
     title: "Rekha Tenjarla",
     description:
-      "Creative technologist and journalist crafting interactive stories at The Washington Post’s R&D Lab.",
+      "Creative technologist and journalist building stories and interactive tools",
     images: ["/og.png"],
   },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html style={{ background: "black", color: "white" }} lang="en">
-      <body className={playfair.className}>{children}</body>
+    <html style={{ background: "#f7f1ec", color: "#171717" }} lang="en">
+      <head>
+        <meta name="color-scheme" content="light" />
+        <meta name="supported-color-schemes" content="light" />
+      </head>
+      <body className={`${playfair.className} ${pixelFont.variable}`}>
+        {children}
+      </body>
     </html>
   );
 }
