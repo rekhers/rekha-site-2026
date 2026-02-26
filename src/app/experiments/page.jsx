@@ -13,8 +13,8 @@ export default function ExperimentsIndex() {
       <header className="space-y-3">
         <h1 className="text-3xl font-semibold tracking-tight">Experiments</h1>
         <p className="max-w-2xl text-base leading-7 text-zinc-700">
-          Small prototypes where I chase a feeling, test a system, or follow a
-          question until it turns visual.
+          Focused technical prototypes across audio, interaction, and visual
+          systems.
         </p>
       </header>
 
@@ -43,8 +43,8 @@ export default function ExperimentsIndex() {
           </p>
           <h2 className="mt-3 text-lg font-semibold">Live Spectrogram</h2>
           <p className="mt-2 text-sm text-zinc-600">
-            A realtime, shader-driven spectrogram that reacts to mic input or a
-            demo track.
+            Realtime spectrogram using shaders, driven by mic input or a demo
+            source.
           </p>
           <span className="mt-4 inline-flex text-sm text-zinc-800">
             Open →
