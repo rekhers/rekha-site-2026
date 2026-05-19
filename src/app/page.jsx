@@ -6,78 +6,67 @@ const WAPO_PROJECTS = [
   {
     title: "Pickleball noise is annoying",
     href: "https://www.washingtonpost.com/science/interactive/2025/why-pickleball-noise-is-annoying/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2F74ABXIPLWBCBBBWNAZTK4UCH2Q.jpg&w=300",
+    image: "/project-previews/pickleball-noise.avif",
   },
   {
     title: "What should EVs sound like?",
     href: "https://www.washingtonpost.com/climate-solutions/interactive/2025/ev-sound-safety-warning/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FZE7WQSZUVRE7RGEN3PEFNSJYX4.png&w=300",
+    image: "/project-previews/ev-sound.jpg",
   },
   {
     title: "How Mayor Muriel Bowser’s vision changed D.C.",
     href: "https://www.washingtonpost.com/dc-md-va/interactive/2025/dc-mayor-muriel-bowser-legacy-10-year-anniversary/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FJDPWHE7LLJHFPLCT4KNGI2GG44.png&w=300",
+    image: "/project-previews/bowser-legacy.jpg",
   },
   {
     title: "AI deepfake voices: Trump & Harris",
     href: "https://www.washingtonpost.com/technology/interactive/2024/ai-voice-detection-trump-harris-deepfake-election/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2F3GNCSO7ALRHWLOLTSO6TG534RE.jpg&w=300",
+    image: "/project-previews/ai-deepfake-voices.avif",
   },
   {
     title: "What the 14th Amendment says",
     href: "https://www.washingtonpost.com/politics/interactive/2024/14th-amendment-trump-ballot/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FZO3Q6GFS2RFPVNTUVGZDGNY4PY.jpg&w=300",
+    image: "/project-previews/fourteenth-amendment.avif",
   },
   {
     title: "Can ChatGPT get into Harvard?",
     href: "https://www.washingtonpost.com/technology/interactive/2024/chatgpt-college-essay-ai-harvard-admission/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FHKWGL42RSNEXFDTSJ6MYSNYFOY.png&w=300",
+    image: "/project-previews/chatgpt-harvard.avif",
   },
   {
     title: "How to talk to an AI",
     href: "https://www.washingtonpost.com/technology/interactive/2023/how-to-talk-ai-chatbot-chatgpt/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FKK4QILC7RJDP7IGXGBPVQITL6Q.jpg&w=300",
+    image: "/project-previews/how-to-talk-ai.avif",
   },
   {
     title: "The Blast Effect",
     href: "https://www.washingtonpost.com/nation/interactive/2023/ar-15-damage-to-human-body/",
-    image: "/blast-effect.png",
+    image: "/project-previews/blast-effect.png",
   },
   {
     title: "Puerto Rico Deaths",
     href: "https://www.washingtonpost.com/nation/interactive/2023/puerto-rico-deaths/",
-    image: "/puerto-rico-deaths.png",
+    image: "/project-previews/puerto-rico-deaths.jpg",
   },
   {
     title: "Space Dodgers",
     href: "https://www.washingtonpost.com/technology/interactive/2023/space-debris-game/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FZ62TUMZXCRHCHC6MDCWGOZ2CS4.png&w=300",
+    image: "/project-previews/space-dodgers.webp",
   },
   {
     title: "To live and die in Tijuana",
     href: "https://www.washingtonpost.com/investigations/interactive/2022/tijuana-mexico-fentanyl-crime/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FAZGAT6UMXPTYASKTC5F3QKPKDA.JPG&w=300",
+    image: "/project-previews/tijuana-fentanyl.jpg",
   },
   {
     title: "Cryptocurrency mine noise",
     href: "https://www.washingtonpost.com/business/interactive/2022/cryptocurrency-mine-noise-homes-nc/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FNBRRCOQNEQI63CHIYWG4HW5O4I.jpg&w=300",
+    image: "/project-previews/crypto-mine-noise.avif",
   },
   {
     title: "Halo armor breakdown",
     href: "https://www.washingtonpost.com/technology/interactive/2022/master-chief-armor-halo-infinite-3d/",
-    image:
-      "https://www.washingtonpost.com/wp-apps/imrs.php?src=https%3A%2F%2Farc-anglerfish-washpost-prod-washpost.s3.amazonaws.com%2Fpublic%2FHJKUBRRLQZG7DKY436DVGHJIKI.jpg&w=300",
+    image: "/project-previews/halo-armor.avif",
   },
 ];
 
@@ -85,41 +74,39 @@ const ARCHIVE_PROJECTS = [
   {
     title: "Halo",
     href: "https://www.washingtonpost.com/technology/interactive/2022/master-chief-armor-halo-infinite-3d/",
-    image: "https://rekhers.github.io/halo.e10294da.png",
+    image: "/project-previews/halo-archive.png",
   },
   {
     title: "Xinjiang",
     href: "https://www.newyorker.com/news/a-reporter-at-large/china-xinjiang-prison-state-uighur-detention-camps-prisoner-testimony",
-    image: "https://rekhers.github.io/xinjiang.8efd75d3.png",
+    image: "/project-previews/xinjiang.png",
   },
   {
     title: "Say Their Names",
     href: "https://www.newyorker.com/culture/cover-story/cover-story-2020-06-22",
-    image:
-      "https://downloads.newyorker.com/projects/2020/200622-cover-nelson/nelson.jpg",
+    image: "/project-previews/say-their-names.jpg",
     focus: "center 35%",
     fit: "cover",
   },
   {
     title: "Five Deeps",
     href: "https://www.newyorker.com/magazine/2020/05/18/thirty-six-thousand-feet-under-the-sea",
-    image: "https://rekhers.github.io/five-deeps.71d967ee.png",
+    image: "/project-previews/five-deeps.png",
   },
   {
     title: "Celebrity Memoirs",
     href: "https://www.newyorker.com/books/page-turner/celebrity-memoirs-book-reviews",
-    image: "https://rekhers.github.io/celebrity-memoirs.cc88c27b.png",
+    image: "/project-previews/celebrity-memoirs.png",
   },
   {
     title: "Covid Hair",
     href: "https://www.newyorker.com/culture/photo-booth/the-unexpected-beauty-of-covid-hair",
-    image: "https://rekhers.github.io/covid-hair.1fbfc4fb.png",
+    image: "/project-previews/covid-hair.png",
   },
   {
     title: "Vaccine Story",
     href: "https://www.newyorker.com/culture/photo-booth/covid-vaccination-new-yorkers",
-    image:
-      "https://downloads.newyorker.com/projects/2021/210423-rosner-portfolio/images/desktop/opener_daniel_d.jpg",
+    image: "/project-previews/vaccine-story.jpg",
     focus: "center 35%",
     fit: "cover",
   },
@@ -133,7 +120,7 @@ const ARCHIVE_PROJECTS = [
   {
     title: "Space Junk",
     href: "https://www.newyorker.com/magazine/2020/09/28/the-elusive-peril-of-space-junk",
-    image: "https://rekhers.github.io/space-junk.f22e6be3.png",
+    image: "/project-previews/space-junk.png",
   },
 ];
 

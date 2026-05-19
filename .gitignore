@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/.npm-cache
 /.pnp
 .pnp.*
 .yarn/*
@@ -16,7 +17,6 @@
 # next.js
 /.next/
 /out/
-/public/
 
 # deploy artifacts / large assets
 /rekha-site.tar.gz
