@@ -3,7 +3,8 @@ import Flow from '@/utils/Flow';
 import { IntroText } from './introText';
 import { PixiBookWall } from './pixiBookWall';
 
-const pageBackgroundColor = '#f7f1ec';
+const pageBackgroundColor = '#171716';
+const introSteps = ['text-enter', 'text-stick', 'references-enter', 'references-hold'];
 
 const Step = ({ children }) => {
 	return (
@@ -33,9 +34,9 @@ export const BookScrolly = ({ books, eventCount }) => {
 		[canonCount, eventCount]
 	);
 	const scene =
-		currentStepIndex >= 4
+		currentStepIndex >= 7
 			? 'focus'
-			: currentStepIndex >= 2
+			: currentStepIndex >= 5
 				? 'canon'
 				: 'wall';
 
@@ -58,7 +59,7 @@ export const BookScrolly = ({ books, eventCount }) => {
 				showAbacus={false}
 				css={{
 					backgroundColor:
-						currentStepIndex === 0 ? 'transparent' : pageBackgroundColor,
+						currentStepIndex <= 3 ? 'transparent' : pageBackgroundColor,
 					position: 'sticky',
 					top: 0,
 					height: '100svh',
@@ -69,33 +70,58 @@ export const BookScrolly = ({ books, eventCount }) => {
 				<Flow.Visual
 					css={{
 						height: '100svh',
-						opacity: currentStepIndex === 0 ? 0 : 1,
 						overflow: 'hidden',
-						transition: 'opacity 1000ms ease 120ms',
 						width: '100vw',
 					}}
 				>
-					<PixiBookWall
-						books={books}
-						isCutout={currentStepIndex === 5}
-						isZoomed={currentStepIndex >= 4}
-						scene={scene}
-					/>
+					<div className='relative h-[100svh] w-screen overflow-hidden'>
+						<div
+							className='absolute inset-0'
+							style={{
+								opacity: currentStepIndex <= 3 ? 1 : 0,
+								pointerEvents: currentStepIndex <= 3 ? 'auto' : 'none',
+								transition: 'opacity 800ms ease',
+							}}
+						>
+							<IntroText
+								liftText={currentStepIndex >= 1}
+								showReferences={currentStepIndex >= 2 && currentStepIndex <= 3}
+							/>
+						</div>
+						<div
+							className='absolute inset-0'
+							style={{
+								opacity: currentStepIndex >= 4 ? 1 : 0,
+								pointerEvents: currentStepIndex >= 4 ? 'auto' : 'none',
+								transition: 'opacity 1000ms ease 120ms',
+							}}
+						>
+							<PixiBookWall
+								books={books}
+								isCutout={currentStepIndex === 8}
+								isZoomed={currentStepIndex >= 7}
+								scene={scene}
+							/>
+						</div>
+					</div>
 				</Flow.Visual>
 			</Flow.Background>
 			<Flow.Foreground>
-				<Flow.Step
-					renderOnStepChangeOnly={true}
-					css={{
-						alignItems: 'center',
-						display: 'flex',
-						minHeight: '120vh',
-						position: 'relative',
-						zIndex: 1,
-					}}
-				>
-					<IntroText />
-				</Flow.Step>
+				{introSteps.map((step) => (
+					<Flow.Step
+						aria-label={step}
+						key={step}
+						renderOnStepChangeOnly={true}
+						css={{
+							minHeight: '100svh',
+							pointerEvents: 'none',
+							position: 'relative',
+							zIndex: 1,
+						}}
+					>
+						<div aria-hidden='true' />
+					</Flow.Step>
+				))}
 				{draftSteps.map((step, index) => (
 					<Flow.Step
 						key={`step-${index}`}
@@ -103,6 +129,7 @@ export const BookScrolly = ({ books, eventCount }) => {
 						css={{
 							display: 'grid',
 							minHeight: '100vh',
+							pointerEvents: 'none',
 							placeItems: 'center',
 							zIndex: 1,
 						}}

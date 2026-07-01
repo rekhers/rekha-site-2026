@@ -1,4 +1,6 @@
 import Flow from '@/utils/Flow';
+import { useState } from 'react';
+import { CutoutCaption, InteractiveCutout } from './interactiveCutout';
 
 const title = `The Ban on Becoming`;
 const deck = `Across U.S. schools, book bans increasingly target stories about race, gender, and sexuality — restricting how young people encounter lives like their own.`;
@@ -6,15 +8,19 @@ const deck = `Across U.S. schools, book bans increasingly target stories about r
 const protagonistCutouts = [
 	{
 		id: 'esperanza',
+		title: 'Esperanza Rising',
+		year: '2000',
 		src: '/drafts/book-bans/esperanza-girl-cutout-v2.png',
 		alt: 'Esperanza from the Esperanza Rising cover',
 		className:
-			'left-[80%] top-[83%] z-20 max-h-[66svh] max-w-[74vw] md:left-[82%] md:top-[55%] md:max-h-[82vh] md:max-w-[46vw]',
+			'left-[48%] top-[70%] z-20 max-h-[30svh] max-w-[36vw] md:left-[63%] md:top-[72%] md:max-h-[38vh] md:max-w-[22vw]',
 		rotation: '2deg',
 		shift: { x: '-3vw', y: '-2vh', rotation: '0deg', scale: 1.05 },
 	},
 	{
 		id: 'marji',
+		title: 'Persepolis',
+		year: '2000',
 		src: '/drafts/book-bans/marji-cutout.png',
 		alt: 'Marji from the Persepolis cover',
 		className:
@@ -24,6 +30,8 @@ const protagonistCutouts = [
 	},
 	{
 		id: 'annie-liza',
+		title: 'Annie on My Mind',
+		year: '1982',
 		src: '/drafts/book-bans/annie-liza-cutout.png',
 		alt: 'Annie and Liza from the Annie on My Mind cover',
 		className:
@@ -33,15 +41,19 @@ const protagonistCutouts = [
 	},
 	{
 		id: 'starr',
+		title: 'The Hate U Give',
+		year: '2017',
 		src: '/drafts/book-bans/starr-cutout.png',
 		alt: 'Starr from The Hate U Give cover',
 		className:
-			'left-[4%] top-[81%] z-10 max-h-[30svh] max-w-[36vw] md:left-[94%] md:top-[86%] md:max-h-[44vh] md:max-w-[25vw]',
+			'left-[84%] top-[70%] z-30 max-h-[25svh] max-w-[30vw] md:left-[75%] md:top-[70%] md:max-h-[34vh] md:max-w-[19vw]',
 		rotation: '-3deg',
 		shift: { x: '-4vw', y: '-6vh', rotation: '2deg', scale: 1.06 },
 	},
 	{
 		id: 'summer',
+		title: 'This One Summer',
+		year: '2014',
 		src: '/drafts/book-bans/this-one-summer-cutout.png',
 		alt: 'The jumping girl from the This One Summer cover',
 		className:
@@ -51,6 +63,8 @@ const protagonistCutouts = [
 	},
 	{
 		id: 'aidan',
+		title: 'When Aidan Became a Brother',
+		year: '2019',
 		src: '/drafts/book-bans/aidan-cutout.png',
 		alt: 'Aidan from the When Aidan Became a Brother cover',
 		className:
@@ -60,6 +74,8 @@ const protagonistCutouts = [
 	},
 	{
 		id: 'terabithia',
+		title: 'Bridge to Terabithia',
+		year: '1977',
 		src: '/drafts/book-bans/bridge-to-terabithia-cutout.png',
 		alt: 'Jess and Leslie from the Bridge to Terabithia cover',
 		className:
@@ -69,6 +85,8 @@ const protagonistCutouts = [
 	},
 	{
 		id: 'perks',
+		title: 'The Perks of Being a Wallflower',
+		year: '1999',
 		src: '/drafts/book-bans/perks-legs-cutout.png',
 		alt: 'The dangling shoes from The Perks of Being a Wallflower cover',
 		className:
@@ -78,6 +96,8 @@ const protagonistCutouts = [
 	},
 	{
 		id: 'caged-bird',
+		title: 'I Know Why the Caged Bird Sings',
+		year: '1969',
 		src: '/drafts/book-bans/caged-bird-cutout.png',
 		alt: 'The bird from the I Know Why the Caged Bird Sings cover',
 		className:
@@ -87,17 +107,71 @@ const protagonistCutouts = [
 		shiftOpacity: 0.3,
 		shift: { x: '-1vw', y: '2vh', rotation: '-2deg', scale: 1.12 },
 	},
+	{
+		id: 'roll-of-thunder',
+		title: 'Roll of Thunder, Hear My Cry',
+		year: '1976',
+		src: '/drafts/book-bans/roll-of-thunder-cutout.png',
+		alt: 'Cassie from the Roll of Thunder, Hear My Cry cover',
+		className:
+			'left-[7%] top-[58%] z-20 max-h-[42svh] max-w-[44vw] md:top-[56%] md:max-h-[58vh] md:max-w-[29vw]',
+		rotation: '-3deg',
+		focusOpacity: 0.46,
+		focus: { x: '0vw', y: '-3vh', rotation: '-1deg', scale: 0.72 },
+		shift: { x: '31vw', y: '-2vh', rotation: '1deg', scale: 1.02 },
+	},
+	{
+		id: 'forever',
+		title: 'Forever...',
+		year: '1975',
+		src: '/drafts/book-bans/forever-cutout.png',
+		alt: 'The locket from the Forever cover',
+		className:
+			'left-[94%] top-[49%] z-20 max-h-[29svh] max-w-[34vw] md:left-[94%] md:top-[47%] md:max-h-[42vh] md:max-w-[22vw]',
+		rotation: '8deg',
+		shift: { x: '-5vw', y: '2vh', rotation: '3deg', scale: 1.08 },
+	},
+	{
+		id: 'poet-x',
+		title: 'The Poet X',
+		year: '2018',
+		src: '/drafts/book-bans/poet-x-cutout.png',
+		alt: 'Xiomara from The Poet X cover',
+		className:
+			'left-[88%] top-[25%] z-10 max-h-[28svh] max-w-[31vw] md:left-[88%] md:top-[25%] md:max-h-[43vh] md:max-w-[26vw]',
+		rotation: '5deg',
+		shift: { x: '-4vw', y: '4vh', rotation: '0deg', scale: 1.06 },
+	},
+	{
+		id: 'melissa',
+		title: 'Melissa',
+		year: '2015',
+		src: '/drafts/book-bans/melissa-cutout.png',
+		alt: 'The colorful Melissa title with Melissa peeking through the final letter',
+		className:
+			'left-[50%] top-[5%] z-0 max-h-[13svh] max-w-[78vw] md:left-[49%] md:top-[5%] md:max-h-[15vh] md:max-w-[48vw]',
+		rotation: '-2deg',
+		opacity: 0.86,
+		shiftOpacity: 0.95,
+		shift: { x: '1vw', y: '4vh', rotation: '1deg', scale: 1.05 },
+	},
 ];
 
 const topperSteps = [
 	{ id: 'collage' },
 	{ id: 'collage-shift' },
-	{ id: 'esperanza-focus' },
+	{ id: 'roll-of-thunder-focus' },
 ];
 
 const TopperVisual = ({ currentStepIndex = 0 }) => {
+	const [activeSelection, setActiveSelection] = useState(null);
+	const activeCutout = protagonistCutouts.find(
+		(cutout) => cutout.id === activeSelection?.id
+	);
+	const activeCutoutVisible =
+		currentStepIndex < 2 || activeCutout?.id === 'roll-of-thunder';
 	const titleOpacity =
-		currentStepIndex === 0 ? 1 : currentStepIndex === 1 ? 0.5 : 0.34;
+		currentStepIndex === 0 ? 1 : currentStepIndex === 1 ? 0.5 : 0;
 
 	return (
 		<div className='relative flex h-[100svh] items-center overflow-hidden px-6 py-20 md:h-screen md:px-12'>
@@ -117,9 +191,9 @@ const TopperVisual = ({ currentStepIndex = 0 }) => {
 			>
 				<h1
 					dangerouslySetInnerHTML={{ __html: title }}
-					className='font-serif text-[clamp(4rem,14vw,11rem)] font-light leading-[0.86] tracking-[-0.045em] text-zinc-950'
+					className='font-serif text-[clamp(4rem,14vw,11rem)] font-light leading-[0.86] tracking-[-0.045em] text-zinc-100'
 				/>
-				<p className='mx-auto mt-6 max-w-[720px] font-serif text-[clamp(1.25rem,2.4vw,2.15rem)] font-light leading-[1.18] tracking-[-0.018em] text-zinc-900 md:mx-0 md:mt-8'>
+				<p className='mx-auto mt-6 max-w-[720px] font-serif text-[clamp(1.25rem,2.4vw,2.15rem)] font-light leading-[1.18] tracking-[-0.018em] text-zinc-200 md:mx-0 md:mt-8'>
 					{deck}
 				</p>
 			</div>
@@ -127,22 +201,29 @@ const TopperVisual = ({ currentStepIndex = 0 }) => {
 				const isShifted = currentStepIndex >= 1;
 				const isFinalFocus = currentStepIndex >= 2;
 				const opacity =
-					isFinalFocus && cutout.id !== 'esperanza'
+					isFinalFocus && cutout.id !== 'roll-of-thunder'
 						? 0
+						: isFinalFocus
+						? cutout.focusOpacity ?? 1
 						: isShifted
 						? cutout.shiftOpacity ?? cutout.opacity ?? 1
 						: cutout.opacity ?? 1;
-				const transform = isShifted
-					? `translate(calc(-50% + ${cutout.shift.x}), calc(-50% + ${cutout.shift.y})) rotate(${cutout.shift.rotation}) scale(${cutout.shift.scale})`
-					: `translate(-50%, -50%) rotate(${cutout.rotation}) scale(1)`;
+				const transform =
+					isFinalFocus && cutout.focus
+						? `translate(calc(-50% + ${cutout.focus.x}), calc(-50% + ${cutout.focus.y})) rotate(${cutout.focus.rotation}) scale(${cutout.focus.scale})`
+						: isShifted
+						? `translate(calc(-50% + ${cutout.shift.x}), calc(-50% + ${cutout.shift.y})) rotate(${cutout.shift.rotation}) scale(${cutout.shift.scale})`
+						: `translate(-50%, -50%) rotate(${cutout.rotation}) scale(1)`;
 
 				return (
-					<img
+					<InteractiveCutout
+						active={activeSelection?.id === cutout.id}
 						alt={cutout.alt}
-						className={`pointer-events-none absolute object-contain ${cutout.className}`}
-						decoding='async'
+						className={cutout.className}
+						disabled={opacity === 0}
+						id={cutout.id}
 						key={cutout.id}
-						loading='eager'
+						onActiveChange={setActiveSelection}
 						src={cutout.src}
 						style={{
 							filter: 'drop-shadow(0 22px 24px rgba(24, 24, 27, 0.2))',
@@ -151,9 +232,15 @@ const TopperVisual = ({ currentStepIndex = 0 }) => {
 							transition:
 								'opacity 800ms ease, transform 1000ms cubic-bezier(0.22, 1, 0.36, 1)',
 						}}
+						title={cutout.title}
+						year={cutout.year}
 					/>
 				);
 			})}
+			<CutoutCaption
+				anchor={activeSelection?.anchor}
+				item={activeCutoutVisible ? activeCutout : null}
+			/>
 		</div>
 	);
 };

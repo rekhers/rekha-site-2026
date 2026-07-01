@@ -19,16 +19,30 @@ export async function loadBookBanData() {
 		fs.readdir(path.join(process.cwd(), coverDir)).catch(() => []),
 	]);
 	const availableCovers = new Set(coverFiles);
+	const statusesByBook = new Map();
+
+	for (const event of events) {
+		const status = event.ban_status?.trim();
+		if (!status) continue;
+		const counts = statusesByBook.get(event.book_id) || new Map();
+		counts.set(status, (counts.get(status) || 0) + 1);
+		statusesByBook.set(event.book_id, counts);
+	}
 
 	return {
 		eventCount: events.length,
 		books: books.map((book) => {
 			const localSmallFile = book.custom_cover_file || `${book.cover_id}-S.jpg`;
 			const localLargeFile = book.custom_cover_file || `${book.cover_id}-L.jpg`;
+			const banStatuses = [...(statusesByBook.get(book.book_id) || new Map())]
+				.sort((left, right) => right[1] - left[1])
+				.slice(0, 3)
+				.map(([status]) => status);
 
 			return {
 				...book,
 				ban_count: Number(book.ban_count),
+				ban_statuses: banStatuses,
 				local_cover_url_small: availableCovers.has(localSmallFile)
 					? `${publicCoverPath}/${localSmallFile}`
 					: '',

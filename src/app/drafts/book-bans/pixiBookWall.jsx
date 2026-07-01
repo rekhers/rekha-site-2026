@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const coverCount = 320;
 const zoomBookTitle = 'esperanza rising';
@@ -127,11 +128,67 @@ function selectDisplayBooks(books) {
 	return booksWithCovers.filter((book) => requiredKeys.has(bookKey(book))).slice(0, coverCount);
 }
 
+function displayAuthor(book) {
+	return book.matched_authors || book.author || 'Author unavailable';
+}
+
+function BookDetails({ book, mobile = false, onClose }) {
+	if (!book) return null;
+	const years = book.school_years.split('|').filter(Boolean);
+	const cover = coverSource(book);
+
+	return (
+		<aside
+			aria-live='polite'
+			className={
+				mobile
+					? 'fixed left-3 right-3 top-3 z-50 flex min-h-28 gap-3 border border-zinc-950 bg-white/95 p-3 shadow-xl backdrop-blur-sm md:hidden'
+					: 'pointer-events-none absolute right-6 top-1/2 z-20 hidden w-[min(21rem,27vw)] -translate-y-1/2 border-l-2 border-zinc-950 bg-white/95 p-6 shadow-xl backdrop-blur-sm md:block'
+			}
+		>
+			<img
+				alt=''
+				className={mobile ? 'h-24 w-16 shrink-0 object-cover' : 'mb-5 h-48 w-32 object-cover'}
+				src={cover}
+			/>
+			<div className='min-w-0 font-serif text-zinc-950'>
+				<p className='text-xl font-semibold leading-tight md:text-3xl'>{book.title}</p>
+				<p className='mt-1 text-sm leading-snug text-zinc-700 md:text-lg'>
+					{displayAuthor(book)}
+				</p>
+				<dl className='mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs leading-snug md:mt-5 md:text-sm'>
+					<dt className='font-sans uppercase tracking-wide text-zinc-500'>Years</dt>
+					<dd>{years.join(', ')}</dd>
+					<dt className='font-sans uppercase tracking-wide text-zinc-500'>Records</dt>
+					<dd>{book.ban_count.toLocaleString()}</dd>
+					{book.ban_statuses?.length ? (
+						<>
+							<dt className='font-sans uppercase tracking-wide text-zinc-500'>Status</dt>
+							<dd>{book.ban_statuses.join(' / ')}</dd>
+						</>
+					) : null}
+				</dl>
+			</div>
+			{mobile ? (
+				<button
+					aria-label='Close book details'
+					className='ml-auto self-start border border-zinc-400 px-2 py-1 font-sans text-xs uppercase tracking-wide'
+					onClick={onClose}
+					type='button'
+				>
+					Close
+				</button>
+			) : null}
+		</aside>
+	);
+}
+
 export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 	const hostRef = useRef(null);
 	const runtimeRef = useRef(null);
 	const sceneRef = useRef(scene);
 	const [rendererFailed, setRendererFailed] = useState(false);
+	const [selectedBook, setSelectedBook] = useState(null);
 	const displayBooks = useMemo(() => selectDisplayBooks(books), [books]);
 	const canonCount = useMemo(
 		() => displayBooks.filter(isCanonBook).length,
@@ -150,7 +207,16 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 	useEffect(() => {
 		sceneRef.current = scene;
 		runtimeRef.current?.updateTargets();
+		if (scene !== 'canon') {
+			runtimeRef.current?.clearSelection();
+			setSelectedBook(null);
+		}
 	}, [scene]);
+
+	function closeBookDetails() {
+		runtimeRef.current?.clearSelection();
+		setSelectedBook(null);
+	}
 
 	useEffect(() => {
 		const host = hostRef.current;
@@ -183,6 +249,7 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 
 				app.canvas.className = 'block h-full w-full';
 				app.canvas.setAttribute('aria-hidden', 'true');
+				app.canvas.style.touchAction = 'pan-y';
 				host.appendChild(app.canvas);
 
 				const records = displayBooks.map((book, index) => {
@@ -214,15 +281,53 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 				const canonIndexByKey = new Map(
 					canonRecords.map((record, index) => [record.key, index])
 				);
+				const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+				let activeRecord = null;
 				const reduceMotion = window.matchMedia(
 					'(prefers-reduced-motion: reduce)'
 				).matches;
+
+				function clearSelection() {
+					if (activeRecord) {
+						activeRecord.emphasized = false;
+						activeRecord.sprite.zIndex = 0;
+					}
+					activeRecord = null;
+				}
+
+				function selectRecord(record) {
+					if (sceneRef.current !== 'canon' || !isCanonBook(record.book)) return;
+					clearSelection();
+					activeRecord = record;
+					record.emphasized = true;
+					record.sprite.zIndex = 1000;
+					setSelectedBook(record.book);
+				}
+
+				app.stage.sortableChildren = true;
+				for (const record of records) {
+					record.sprite.on('pointerover', () => {
+						if (finePointer.matches) selectRecord(record);
+					});
+					record.sprite.on('pointerout', () => {
+						if (!finePointer.matches || activeRecord !== record) return;
+						clearSelection();
+						setSelectedBook(null);
+					});
+					record.sprite.on('pointertap', () => {
+						if (!finePointer.matches) selectRecord(record);
+					});
+				}
 
 				function updateTargets() {
 					const width = app.screen.width;
 					const height = app.screen.height;
 
 					for (const record of records) {
+						const isInteractive =
+							sceneRef.current === 'canon' && canonIndexByKey.has(record.key);
+						record.sprite.eventMode = isInteractive ? 'static' : 'none';
+						record.sprite.cursor = isInteractive ? 'pointer' : 'default';
 						if (sceneRef.current === 'canon') {
 							record.target = canonLayout(
 								record,
@@ -253,7 +358,8 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 						sprite.y += (target.y - sprite.y) * easing;
 						sprite.alpha += (target.alpha - sprite.alpha) * easing;
 						sprite.rotation += (target.rotation - sprite.rotation) * easing;
-						const width = sprite.width + (target.width - sprite.width) * easing;
+						const targetWidth = target.width * (record.emphasized ? 1.18 : 1);
+						const width = sprite.width + (targetWidth - sprite.width) * easing;
 						sprite.width = width;
 						sprite.height = width * 1.5;
 					}
@@ -261,7 +367,7 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 
 				updateTargets();
 				app.ticker.add(tick);
-				runtimeRef.current = { updateTargets };
+				runtimeRef.current = { clearSelection, updateTargets };
 				resizeObserver = new ResizeObserver(() => updateTargets());
 				resizeObserver.observe(host);
 
@@ -324,10 +430,21 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 			<link rel='preload' as='image' href={esperanzaCutoutSrc} />
 			<div
 				aria-label={`A wall of ${displayBooks.length} frequently banned books. ${canonCount} appear in every school year in the dataset.`}
-				className='absolute inset-0'
+				className={`absolute inset-0 ${scene === 'canon' ? 'cursor-pointer' : ''}`}
 				ref={hostRef}
 				role='img'
 			/>
+			<BookDetails book={selectedBook} />
+			{selectedBook && typeof document !== 'undefined'
+				? createPortal(
+						<BookDetails
+							book={selectedBook}
+							mobile
+							onClose={closeBookDetails}
+						/>,
+						document.body
+					)
+				: null}
 			{rendererFailed ? (
 				<p className='absolute inset-0 grid place-items-center font-serif text-xl text-zinc-700'>
 					The book wall could not be rendered.
