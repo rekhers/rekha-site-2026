@@ -6,7 +6,7 @@
 # ---------- CONFIG ----------
 APP_NAME="rekha-site"
 REMOTE_USER="rekhers"
-REMOTE_HOST="160.153.190.72"
+REMOTE_HOST="rekha-site"
 REMOTE_DIR="/home/$REMOTE_USER/$APP_NAME"
 LOCAL_DIR="."                       # current folder
 TAR_NAME="rekha-site.tar.gz"
@@ -37,7 +37,7 @@ rsync -avz --delete --progress \
   --exclude ".DS_Store" \
   --exclude "rekha-site.tar.gz" \
   package.json package-lock.json next.config.mjs \
-  public src \
+  data public src \
   $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/
 
 # ---------- DEPLOY ON SERVER ----------

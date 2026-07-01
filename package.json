@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "data:book-bans": "node scripts/normalize-book-bans.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

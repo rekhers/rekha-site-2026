@@ -1,0 +1,154 @@
+import { Canvas, Meta, Source, ArgTypes } from '@storybook/addon-docs/blocks'
+import { styled } from 'storybook/theming'
+import * as Flow from './Flow.stories'
+
+export const StyledDiv = styled.div`
+  p,
+  li {
+    font-size: 16px !important;
+    margin-bottom: 8px;
+  }
+  .arrow {
+    color: #000 !important;
+    z-index: 1;
+  }
+  .arrow:before {
+    position: 'initial';
+  }
+`
+export const StyledImage = styled.img`
+  max-width: 75%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+`
+
+<Meta of={Flow} />
+
+<StyledDiv>
+
+# Flow
+
+Flow is a flexible scrolling library build around (instead of despite) React.
+
+<ArgTypes of={Flow} />
+## 
+## How to use 
+Flow can be added to any component. At the top of your component file, add the line `import { Flow } from '@washingtonpost/custom-template-components'`. This will import the Flow component.
+
+Once you've done this, you can then take advantage of several components inside of the Flow library: `Root`, `Background`, `Foreground`, `Visual` and `Step`.
+
+A basic Flow structure looks like this:
+
+```jsx
+import { Flow } from '@washingtonpost/custom-template-components'
+
+const MyScrollComponent = props => {
+  return (
+    <Flow.Root>
+      <Flow.Background>
+        <Flow.Visual>First visual</Flow.Visual>
+        <Flow.Visual>Second visual</Flow.Visual>
+      </Flow.Background>
+      <Flow.Foreground>
+        <Flow.Step>First step</Flow.Step>
+        <Flow.Step>Second step</Flow.Step>
+      </Flow.Foreground>
+    </Flow.Root>
+  )
+}
+```
+
+## Library structure
+
+### Flow.Root
+
+This component contains the Scrolling experience within a single div. It is responsible for handling a unique React context for your scrolling experience.
+
+### Flow.Background
+
+This component contains all of your visual components. It is responsible for figuring out how many visuals you have, and helps pass the index, percent and other scrolling values to each Visual component.
+
+### Flow.Visual
+
+This component contains the visual you want to present and will update (in a way you choose) every time a corresponding step is on screen. You can put both regular HTML or a React component inside this component. If you give it a React component, the Visual component will dynamically inject props into your component: `currentIndex`, `stepIndex` and `stepArray`. These values can be useful for advanced layouts.
+
+### Flow.Foreground
+
+This component contains all of your steps. It is responsible for figuring out how many steps you have, and helps pass the index, percent and other scrolling values to each Step component.
+
+### Flow.Step
+
+This component contains the step you want to present, and is responsible for updating the currentIndex and percent. In addition to these values getting passed to corresponding Visual components (mentioned above), you can also use these values within your Step component. Similar to Visual, if you place a React component inside a Step, the `currentIndex`, `stepIndex` and `stepArray` are dynamically injected as props.
+
+## Usage examples
+
+You can preview the code for the examples in the left rail [here.](https://github.com/WashPostNewsDev/generator-custom-template/blob/dev/packages/create-custom-template/template/components/furniture/Flow/Flow.stories.js)
+
+### Mapping visuals and steps
+
+In general, you'll want to have the same number of visuals as steps (though this is not required). You can mix and match mapped items and static items. This can reduce repeated code but also allow for flexibility when needed.
+
+```jsx
+import { Flow } from '@washingtonpost/custom-template-components'
+
+const MyScrollComponent = props =>  {
+
+  const visuals = ['First visual', 'Second visual']
+  const steps = ['First step', 'Second step']
+
+  return (
+   <Flow.Root>
+   <Flow.Background>
+    {visuals.map((visual)=>{
+      return <Flow.Visual key={visual}>{visual}</Flow.Visual>
+    })}
+    <Flow.Visual>Third visual</Visual> {/* note this visual is not inside the map */}
+   </Flow.Background>
+   <Flow.Foreground>
+    {steps.map((step)=>{
+      return <Flow.Step key={step}>{step}</Flow.Step>
+    })}
+    <Flow.Step>Third step</Flow.Step>  {/* note this step is not inside the map */}
+   </Flow.Foreground>
+   </Flow.Root>
+  )
+}
+```
+
+### Using props passed from Visual or Step
+
+As mentioned above, if you provide a Visual or a Step with a React component, several props will be injected into that component. The extra data (the currentIndex, stepIndex and percentages) you get from these props can be useful in some scenarios.
+
+Here's an example of a scrolling experience that would zoom in on your visual as the corresponding step was scrolled through the screen:
+
+```jsx
+import { Flow } from '@washingtonpost/custom-template-components'
+
+const MyVisualComponent = props => {
+  const {visualIndex, currentVisualIndex, currentStepIndex, stepArray} = props {/* stepArray is an array of all of your steps with percent data */}
+
+   {/* To access the percentage of each step, you can grab the percent from the stepArray */}
+  const percent = stepArray[currentStepIndex].elementAboveViewport
+    {/* This can be used to modify styles or add to any other scroll based metric */}
+  const scale = 1 + percent
+  return (<Box css={{
+    transform: `scale(${scale})`
+    }}>
+    </Box>)
+}
+
+const MyScrollComponent = props =>  {
+ return (
+   <Flow.Root>
+   <Flow.Background>
+    <Flow.Visual><MyVisualComponent /></Visual>
+   </Flow.Background>
+   <Flow.Foreground>
+    <Flow.Step>Single step</Flow.Step>
+   </Flow.Foreground>
+   </Flow.Root>
+  )
+}
+```
+
+</StyledDiv>

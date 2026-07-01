@@ -22,6 +22,10 @@
 /rekha-site.tar.gz
 /public/models/
 
+# private draft data
+/data/private/book-bans/
+/public/drafts/book-bans/covers/
+
 # production
 /build
 
