@@ -79,7 +79,7 @@ const protagonistCutouts = [
 		src: '/drafts/book-bans/bridge-to-terabithia-cutout.png',
 		alt: 'Jess and Leslie from the Bridge to Terabithia cover',
 		className:
-			'left-[69%] top-[16%] z-10 max-h-[20svh] max-w-[58vw] md:left-[41%] md:top-[13%] md:max-h-[23vh] md:max-w-[34vw]',
+			'left-[50%] top-[16%] z-10 max-h-[20svh] max-w-[58vw] md:left-[30%] md:top-[13%] md:max-h-[23vh] md:max-w-[34vw]',
 		rotation: '3deg',
 		shift: { x: '3vw', y: '4vh', rotation: '-1deg', scale: 1.06 },
 	},
@@ -101,7 +101,7 @@ const protagonistCutouts = [
 		src: '/drafts/book-bans/caged-bird-cutout.png',
 		alt: 'The bird from the I Know Why the Caged Bird Sings cover',
 		className:
-			'left-[49%] top-[65%] z-0 max-h-[27svh] max-w-[72vw] md:left-[57%] md:top-[36%] md:max-h-[40vh] md:max-w-[44vw]',
+			'left-[49%] top-[65%] z-0 max-h-[24svh] max-w-[54vw] md:left-[57%] md:top-[36%] md:max-h-[40vh] md:max-w-[40vw]',
 		rotation: '-9deg',
 		opacity: 0.18,
 		shiftOpacity: 0.3,
@@ -114,11 +114,9 @@ const protagonistCutouts = [
 		src: '/drafts/book-bans/roll-of-thunder-cutout.png',
 		alt: 'Cassie from the Roll of Thunder, Hear My Cry cover',
 		className:
-			'left-[7%] top-[58%] z-20 max-h-[42svh] max-w-[44vw] md:top-[56%] md:max-h-[58vh] md:max-w-[29vw]',
+			'left-[47%] top-[58%] z-20 max-h-[42svh] max-w-[44vw] md:top-[56%] md:max-h-[58vh] md:max-w-[29vw]',
 		rotation: '-3deg',
-		focusOpacity: 0.46,
-		focus: { x: '0vw', y: '-3vh', rotation: '-1deg', scale: 0.72 },
-		shift: { x: '31vw', y: '-2vh', rotation: '1deg', scale: 1.02 },
+		shift: { x: '1vw', y: '1vh', rotation: '1deg', scale: 0.88 },
 	},
 	{
 		id: 'forever',
@@ -127,7 +125,7 @@ const protagonistCutouts = [
 		src: '/drafts/book-bans/forever-cutout.png',
 		alt: 'The locket from the Forever cover',
 		className:
-			'left-[94%] top-[49%] z-20 max-h-[29svh] max-w-[34vw] md:left-[94%] md:top-[47%] md:max-h-[42vh] md:max-w-[22vw]',
+			'left-[94%] top-[51%] z-20 max-h-[29svh] max-w-[34vw] md:left-[90%] md:top-[65%] md:max-h-[42vh] md:max-w-[22vw]',
 		rotation: '8deg',
 		shift: { x: '-5vw', y: '2vh', rotation: '3deg', scale: 1.08 },
 	},
@@ -157,11 +155,7 @@ const protagonistCutouts = [
 	},
 ];
 
-const topperSteps = [
-	{ id: 'collage' },
-	{ id: 'collage-shift' },
-	{ id: 'roll-of-thunder-focus' },
-];
+const topperSteps = [{ id: 'collage' }, { id: 'title-cassie-fade' }];
 
 const TopperVisual = ({ currentStepIndex = 0 }) => {
 	const [activeSelection, setActiveSelection] = useState(null);
@@ -169,9 +163,8 @@ const TopperVisual = ({ currentStepIndex = 0 }) => {
 		(cutout) => cutout.id === activeSelection?.id
 	);
 	const activeCutoutVisible =
-		currentStepIndex < 2 || activeCutout?.id === 'roll-of-thunder';
-	const titleOpacity =
-		currentStepIndex === 0 ? 1 : currentStepIndex === 1 ? 0.5 : 0;
+		currentStepIndex === 0 || activeCutout?.id === 'roll-of-thunder';
+	const titleOpacity = currentStepIndex === 0 ? 1 : 0.72;
 
 	return (
 		<div className='relative flex h-[100svh] items-center overflow-hidden px-6 py-20 md:h-screen md:px-12'>
@@ -198,20 +191,15 @@ const TopperVisual = ({ currentStepIndex = 0 }) => {
 				</p>
 			</div>
 			{protagonistCutouts.map((cutout) => {
-				const isShifted = currentStepIndex >= 1;
-				const isFinalFocus = currentStepIndex >= 2;
+				const isClosingBeat = currentStepIndex >= 1;
 				const opacity =
-					isFinalFocus && cutout.id !== 'roll-of-thunder'
+					isClosingBeat && cutout.id !== 'roll-of-thunder'
 						? 0
-						: isFinalFocus
-						? cutout.focusOpacity ?? 1
-						: isShifted
-						? cutout.shiftOpacity ?? cutout.opacity ?? 1
+						: isClosingBeat
+						? 0.72
 						: cutout.opacity ?? 1;
 				const transform =
-					isFinalFocus && cutout.focus
-						? `translate(calc(-50% + ${cutout.focus.x}), calc(-50% + ${cutout.focus.y})) rotate(${cutout.focus.rotation}) scale(${cutout.focus.scale})`
-						: isShifted
+					isClosingBeat && cutout.id === 'roll-of-thunder'
 						? `translate(calc(-50% + ${cutout.shift.x}), calc(-50% + ${cutout.shift.y})) rotate(${cutout.shift.rotation}) scale(${cutout.shift.scale})`
 						: `translate(-50%, -50%) rotate(${cutout.rotation}) scale(1)`;
 
