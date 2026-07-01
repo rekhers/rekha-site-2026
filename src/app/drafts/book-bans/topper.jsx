@@ -1,7 +1,7 @@
 import Flow from '@/utils/Flow';
 
-const title = `The Rise of <br/> the Identity-Based Book Ban`;
-const deck = `Today’s school book bans increasingly target stories about race, gender, sexuality, and the young people learning to see themselves through them.`;
+const title = `The Ban on Becoming`;
+const deck = `Across U.S. schools, book bans increasingly target stories about race, gender, and sexuality — restricting how young people encounter lives like their own.`;
 
 const protagonistCutouts = [
 	{
@@ -58,6 +58,35 @@ const protagonistCutouts = [
 		rotation: '6deg',
 		shift: { x: '2vw', y: '-7vh', rotation: '1deg', scale: 1.08 },
 	},
+	{
+		id: 'terabithia',
+		src: '/drafts/book-bans/bridge-to-terabithia-cutout.png',
+		alt: 'Jess and Leslie from the Bridge to Terabithia cover',
+		className:
+			'left-[69%] top-[16%] z-10 max-h-[20svh] max-w-[58vw] md:left-[41%] md:top-[13%] md:max-h-[23vh] md:max-w-[34vw]',
+		rotation: '3deg',
+		shift: { x: '3vw', y: '4vh', rotation: '-1deg', scale: 1.06 },
+	},
+	{
+		id: 'perks',
+		src: '/drafts/book-bans/perks-legs-cutout.png',
+		alt: 'The dangling shoes from The Perks of Being a Wallflower cover',
+		className:
+			'left-[94%] top-[17%] z-20 max-h-[28svh] max-w-[25vw] md:left-[71%] md:top-[12%] md:max-h-[35vh] md:max-w-[16vw]',
+		rotation: '-2deg',
+		shift: { x: '-2vw', y: '5vh', rotation: '3deg', scale: 1.04 },
+	},
+	{
+		id: 'caged-bird',
+		src: '/drafts/book-bans/caged-bird-cutout.png',
+		alt: 'The bird from the I Know Why the Caged Bird Sings cover',
+		className:
+			'left-[49%] top-[65%] z-0 max-h-[27svh] max-w-[72vw] md:left-[57%] md:top-[36%] md:max-h-[40vh] md:max-w-[44vw]',
+		rotation: '-9deg',
+		opacity: 0.18,
+		shiftOpacity: 0.3,
+		shift: { x: '-1vw', y: '2vh', rotation: '-2deg', scale: 1.12 },
+	},
 ];
 
 const topperSteps = [
@@ -97,7 +126,12 @@ const TopperVisual = ({ currentStepIndex = 0 }) => {
 			{protagonistCutouts.map((cutout) => {
 				const isShifted = currentStepIndex >= 1;
 				const isFinalFocus = currentStepIndex >= 2;
-				const opacity = isFinalFocus && cutout.id !== 'esperanza' ? 0 : 1;
+				const opacity =
+					isFinalFocus && cutout.id !== 'esperanza'
+						? 0
+						: isShifted
+						? cutout.shiftOpacity ?? cutout.opacity ?? 1
+						: cutout.opacity ?? 1;
 				const transform = isShifted
 					? `translate(calc(-50% + ${cutout.shift.x}), calc(-50% + ${cutout.shift.y})) rotate(${cutout.shift.rotation}) scale(${cutout.shift.scale})`
 					: `translate(-50%, -50%) rotate(${cutout.rotation}) scale(1)`;
@@ -137,7 +171,7 @@ export const Topper = () => {
 			<Flow.Background
 				showAbacus={false}
 				css={{
-					height: '100svh',
+					height: '100vh',
 					overflow: 'hidden',
 					position: 'sticky',
 					top: 0,

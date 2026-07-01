@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "data:book-bans": "node scripts/normalize-book-bans.mjs",
+    "data:book-ban-wall-covers": "node scripts/cache-book-ban-wall-covers.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -15,6 +16,7 @@
     "compromise": "^14.14.5",
     "lodash-es": "^4.17.23",
     "next": "16.1.6",
+    "pixi.js": "^8.19.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "three": "^0.182.0"
