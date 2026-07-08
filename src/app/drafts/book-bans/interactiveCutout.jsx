@@ -1,7 +1,9 @@
 'use client';
 
 const whiteOutline =
-	'drop-shadow(1.5px 0 0 white) drop-shadow(-1.5px 0 0 white) drop-shadow(0 1.5px 0 white) drop-shadow(0 -1.5px 0 white)';
+	'drop-shadow(1.25px 0 0 white) drop-shadow(-1.25px 0 0 white) drop-shadow(0 1.25px 0 white) drop-shadow(0 -1.25px 0 white)';
+const activeWhiteOutline =
+	'drop-shadow(2.25px 0 0 white) drop-shadow(-2.25px 0 0 white) drop-shadow(0 2.25px 0 white) drop-shadow(0 -2.25px 0 white)';
 
 export function InteractiveCutout({
 	active,
@@ -58,8 +60,8 @@ export function InteractiveCutout({
 			style={{
 				...style,
 				filter: active
-					? `${whiteOutline} drop-shadow(0 22px 24px rgba(0, 0, 0, 0.42))`
-					: style?.filter,
+					? `${activeWhiteOutline} drop-shadow(0 22px 24px rgba(0, 0, 0, 0.48))`
+					: `${whiteOutline} ${style?.filter ?? ''}`,
 				pointerEvents: disabled ? 'none' : style?.pointerEvents,
 			}}
 			tabIndex={disabled ? -1 : 0}
