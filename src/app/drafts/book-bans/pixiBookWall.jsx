@@ -183,9 +183,16 @@ function BookDetails({ book, mobile = false, onClose }) {
 	);
 }
 
-export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
+export function PixiBookWall({
+	annotationsEnabled = false,
+	books,
+	scene = 'wall',
+	isZoomed,
+	isCutout,
+}) {
 	const hostRef = useRef(null);
 	const runtimeRef = useRef(null);
+	const annotationsEnabledRef = useRef(annotationsEnabled);
 	const sceneRef = useRef(scene);
 	const [rendererFailed, setRendererFailed] = useState(false);
 	const [selectedBook, setSelectedBook] = useState(null);
@@ -207,11 +214,20 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 	useEffect(() => {
 		sceneRef.current = scene;
 		runtimeRef.current?.updateTargets();
-		if (scene !== 'canon') {
+		if (scene !== 'canon' || !annotationsEnabledRef.current) {
 			runtimeRef.current?.clearSelection();
 			setSelectedBook(null);
 		}
 	}, [scene]);
+
+	useEffect(() => {
+		annotationsEnabledRef.current = annotationsEnabled;
+		runtimeRef.current?.updateTargets();
+		if (!annotationsEnabled) {
+			runtimeRef.current?.clearSelection();
+			setSelectedBook(null);
+		}
+	}, [annotationsEnabled]);
 
 	function closeBookDetails() {
 		runtimeRef.current?.clearSelection();
@@ -296,7 +312,13 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 				}
 
 				function selectRecord(record) {
-					if (sceneRef.current !== 'canon' || !isCanonBook(record.book)) return;
+					if (
+						!annotationsEnabledRef.current ||
+						sceneRef.current !== 'canon' ||
+						!isCanonBook(record.book)
+					) {
+						return;
+					}
 					clearSelection();
 					activeRecord = record;
 					record.emphasized = true;
@@ -325,7 +347,9 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 
 					for (const record of records) {
 						const isInteractive =
-							sceneRef.current === 'canon' && canonIndexByKey.has(record.key);
+							annotationsEnabledRef.current &&
+							sceneRef.current === 'canon' &&
+							canonIndexByKey.has(record.key);
 						record.sprite.eventMode = isInteractive ? 'static' : 'none';
 						record.sprite.cursor = isInteractive ? 'pointer' : 'default';
 						if (sceneRef.current === 'canon') {
@@ -430,7 +454,7 @@ export function PixiBookWall({ books, scene = 'wall', isZoomed, isCutout }) {
 			<link rel='preload' as='image' href={esperanzaCutoutSrc} />
 			<div
 				aria-label={`A wall of ${displayBooks.length} frequently banned books. ${canonCount} appear in every school year in the dataset.`}
-				className={`absolute inset-0 ${scene === 'canon' ? 'cursor-pointer' : ''}`}
+				className={`absolute inset-0 ${annotationsEnabled ? 'cursor-pointer' : ''}`}
 				ref={hostRef}
 				role='img'
 			/>

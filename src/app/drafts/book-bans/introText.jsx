@@ -37,7 +37,11 @@ const references = [
 	},
 ];
 
-export const IntroText = ({ liftText = false, showReferences = false }) => {
+export const IntroText = ({
+	enableReferences = false,
+	liftText = false,
+	showReferences = false,
+}) => {
 	const [activeSelection, setActiveSelection] = useState(null);
 	const activeCutout = references.find(
 		(reference) => reference.id === activeSelection?.id
@@ -50,7 +54,7 @@ export const IntroText = ({ liftText = false, showReferences = false }) => {
 					active={activeSelection?.id === reference.id}
 					alt={reference.alt}
 					className={reference.className}
-					disabled={!showReferences}
+					disabled={!enableReferences}
 					id={reference.id}
 					key={reference.src}
 					onActiveChange={setActiveSelection}
@@ -94,7 +98,7 @@ export const IntroText = ({ liftText = false, showReferences = false }) => {
 			</div>
 			<CutoutCaption
 				anchor={activeSelection?.anchor}
-				item={showReferences ? activeCutout : null}
+				item={enableReferences ? activeCutout : null}
 			/>
 		</div>
 	);
