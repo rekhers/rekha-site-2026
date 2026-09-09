@@ -5,6 +5,12 @@ import { PixiBookWall } from './pixiBookWall';
 
 const pageBackgroundColor = '#171716';
 const introSteps = ['text-enter', 'text-stick', 'references-enter', 'references-hold'];
+const wallStartStep = introSteps.length;
+const canonStep = wallStartStep + 1;
+const focusStep = wallStartStep + 3;
+const esperanzaStep = wallStartStep + 4;
+const exploreTextStep = wallStartStep + 5;
+const interactionStep = wallStartStep + 6;
 
 const Step = ({ children }) => {
 	return (
@@ -30,13 +36,17 @@ export const BookScrolly = ({ books, eventCount }) => {
 			`${canonCount.toLocaleString()} books appear in every school year in the dataset.`,
 			'',
 			'',
+			'Explore these titles yourself.',
+			'',
 		],
 		[canonCount, eventCount]
 	);
 	const scene =
-		currentStepIndex >= 7
+		currentStepIndex >= exploreTextStep
+			? 'canon'
+			: currentStepIndex >= focusStep
 			? 'focus'
-			: currentStepIndex >= 5
+			: currentStepIndex >= canonStep
 				? 'canon'
 				: 'wall';
 
@@ -84,8 +94,9 @@ export const BookScrolly = ({ books, eventCount }) => {
 							}}
 						>
 							<IntroText
+								enableReferences={currentStepIndex >= 2}
 								liftText={currentStepIndex >= 1}
-								showReferences={currentStepIndex >= 2 && currentStepIndex <= 3}
+								showReferences={currentStepIndex >= 1 && currentStepIndex <= 3}
 							/>
 						</div>
 						<div
@@ -97,9 +108,16 @@ export const BookScrolly = ({ books, eventCount }) => {
 							}}
 						>
 							<PixiBookWall
+								annotationsEnabled={currentStepIndex >= interactionStep}
 								books={books}
-								isCutout={currentStepIndex === 8}
-								isZoomed={currentStepIndex >= 7}
+								isCutout={
+									currentStepIndex >= esperanzaStep &&
+									currentStepIndex < exploreTextStep
+								}
+								isZoomed={
+									currentStepIndex >= focusStep &&
+									currentStepIndex < exploreTextStep
+								}
 								scene={scene}
 							/>
 						</div>
