@@ -1,6 +1,20 @@
+import localFont from "next/font/local";
 import { Geist, Geist_Mono, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { Playfair_Display } from "next/font/google";
+
+// Luciole: Laurent Bourcellier & Jonathan Perez, CC BY 4.0.
+// License and attribution: public/fonts/luciole/LICENSE.txt
+const luciole = localFont({
+  src: [
+    { path: "../../public/fonts/luciole/Luciole-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../../public/fonts/luciole/Luciole-Bold.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-luciole",
+  preload: true,
+  display: "optional",
+  adjustFontFallback: "Arial",
+});
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
@@ -77,7 +91,7 @@ export default function RootLayout({ children }) {
         <meta name="color-scheme" content="light" />
         <meta name="supported-color-schemes" content="light" />
       </head>
-      <body className={`${playfair.className} ${playfair.variable} ${geistSans.variable} ${geistMono.variable} ${pixelFont.variable}`}>
+      <body className={`${luciole.variable} ${playfair.className} ${playfair.variable} ${geistSans.variable} ${geistMono.variable} ${pixelFont.variable}`}>
         {children}
       </body>
     </html>
