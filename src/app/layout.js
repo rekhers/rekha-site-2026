@@ -2,7 +2,7 @@ import { Geist, Geist_Mono, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import { Playfair_Display } from "next/font/google";
 
-const playfair = Playfair_Display({ subsets: ["latin"] });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +28,7 @@ export const metadata = {
     template: "%s | Rekha Tenjarla",
   },
   description:
-    "Rekha Tenjarla is a creative technologist and journalist building interactive, experimental stories at The Washington Post’s R&D Lab.",
+    "Rekha Tenjarla is a creative technologist at Fathom Information Design, interested in storytelling, interaction, and systems.",
   keywords: [
     "Rekha Tenjarla",
     "creative technologist",
@@ -77,7 +77,7 @@ export default function RootLayout({ children }) {
         <meta name="color-scheme" content="light" />
         <meta name="supported-color-schemes" content="light" />
       </head>
-      <body className={`${playfair.className} ${pixelFont.variable}`}>
+      <body className={`${playfair.className} ${playfair.variable} ${geistSans.variable} ${geistMono.variable} ${pixelFont.variable}`}>
         {children}
       </body>
     </html>

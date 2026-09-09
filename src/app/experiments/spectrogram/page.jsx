@@ -8,99 +8,87 @@ export default function SpectrogramPage() {
   const analyserRef = useRef(null);
   const audioContextRef = useRef(null);
   const sourceRef = useRef(null);
-  const audioRef = useRef(null);
+  const streamRef = useRef(null);
+  const requestRef = useRef(0);
+  const [isStarting, setIsStarting] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [status, setStatus] = useState("Demo ready");
-  const [mode, setMode] = useState("demo");
+  const [status, setStatus] = useState("Ready");
   const [baseColor, setBaseColor] = useState("#2b0f5c");
   const [highlightColor, setHighlightColor] = useState("#d7a6ff");
 
   useEffect(() => {
     return () => {
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
+      requestRef.current += 1;
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      sourceRef.current?.disconnect();
+      sourceRef.current = null;
+      analyserRef.current = null;
+      const context = audioContextRef.current;
+      audioContextRef.current = null;
+      if (context && context.state !== "closed") context.close().catch(console.error);
     };
   }, []);
 
-  const ensureContext = () => {
-    if (audioContextRef.current) return audioContextRef.current;
-    audioContextRef.current = new (
-      window.AudioContext || window.webkitAudioContext
-    )();
-    return audioContextRef.current;
-  };
-
-  const startDemo = async () => {
-    try {
-      setMode("demo");
-      setStatus("Loading demo audio...");
-      const audioContext = ensureContext();
-      if (audioContext.state === "suspended") {
-        await audioContext.resume();
-      }
-
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 4096;
-      analyser.smoothingTimeConstant = 0.2;
-
-      const audioEl = audioRef.current;
-      if (!audioEl) return;
-      audioEl.crossOrigin = "anonymous";
-      const source = audioContext.createMediaElementSource(audioEl);
-      source.connect(analyser);
-      analyser.connect(audioContext.destination);
-
-      analyserRef.current = analyser;
-      sourceRef.current = source;
-
-      await audioEl.play();
-      setIsActive(true);
-      setStatus("Demo playing");
-    } catch (error) {
-      console.error(error);
-      setStatus("Demo failed");
-    }
-  };
-
   const startMic = async () => {
+    if (isStarting || isActive) return;
+    const request = ++requestRef.current;
+    let stream;
+    let context;
+    setIsStarting(true);
+    setStatus("Requesting mic access...");
     try {
-      setMode("mic");
-      setStatus("Requesting mic access...");
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioContext = ensureContext();
-      if (audioContext.state === "suspended") {
-        await audioContext.resume();
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (request !== requestRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
       }
-      const analyser = audioContext.createAnalyser();
+      streamRef.current = stream;
+      context = new (window.AudioContext || window.webkitAudioContext)();
+      audioContextRef.current = context;
+      if (context.state === "suspended") await context.resume();
+      if (request !== requestRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        if (context.state !== "closed") await context.close();
+        return;
+      }
+      const analyser = context.createAnalyser();
       analyser.fftSize = 4096;
       analyser.smoothingTimeConstant = 0.2;
-      const source = audioContext.createMediaStreamSource(stream);
+      const source = context.createMediaStreamSource(stream);
       source.connect(analyser);
-
       analyserRef.current = analyser;
-      audioContextRef.current = audioContext;
       sourceRef.current = source;
-
       setIsActive(true);
       setStatus("Listening");
     } catch (error) {
-      console.error(error);
-      setStatus("Mic blocked");
+      stream?.getTracks().forEach((track) => track.stop());
+      if (context && context.state !== "closed") context.close().catch(console.error);
+      if (request === requestRef.current) {
+        streamRef.current = null;
+        audioContextRef.current = null;
+        sourceRef.current = null;
+        analyserRef.current = null;
+        setIsActive(false);
+        setStatus("Could not start microphone");
+        console.error(error);
+      }
+    } finally {
+      if (request === requestRef.current) setIsStarting(false);
     }
   };
 
-  const stopAudio = async () => {
-    if (audioContextRef.current) {
-      await audioContextRef.current.close();
-    }
-    analyserRef.current = null;
-    audioContextRef.current = null;
+  const stopAudio = () => {
+    requestRef.current += 1;
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    sourceRef.current?.disconnect();
     sourceRef.current = null;
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
+    analyserRef.current = null;
+    const context = audioContextRef.current;
+    audioContextRef.current = null;
+    if (context && context.state !== "closed") context.close().catch(console.error);
+    setIsStarting(false);
     setIsActive(false);
     setStatus("Stopped");
   };
@@ -131,24 +119,16 @@ export default function SpectrogramPage() {
       <div className="flex flex-wrap items-center gap-4">
         <button
           type="button"
-          onClick={startDemo}
-          disabled={isActive && mode === "demo"}
-          className="rounded-full border border-zinc-300 px-5 py-2 text-sm uppercase tracking-[0.2em] text-zinc-700 transition hover:border-zinc-500 disabled:opacity-50"
-        >
-          Play demo
-        </button>
-        <button
-          type="button"
           onClick={startMic}
-          disabled={isActive}
+          disabled={isActive || isStarting}
           className="rounded-full border border-zinc-300 px-5 py-2 text-sm uppercase tracking-[0.2em] text-zinc-700 transition hover:border-zinc-500 disabled:opacity-50"
         >
-          Enable mic
+          Start
         </button>
         <button
           type="button"
           onClick={stopAudio}
-          disabled={!isActive}
+          disabled={!isActive && !isStarting}
           className="rounded-full border border-zinc-300 px-5 py-2 text-sm uppercase tracking-[0.2em] text-zinc-700 transition hover:border-zinc-500 disabled:opacity-50"
         >
           Stop
@@ -180,8 +160,6 @@ export default function SpectrogramPage() {
           />
         </label>
       </div>
-
-      <audio ref={audioRef} src="/audio/only-shallow.mp3" />
 
       <SpectrogramScene
         analyserRef={analyserRef}

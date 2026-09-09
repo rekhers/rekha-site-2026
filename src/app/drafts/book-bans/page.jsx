@@ -1,8 +1,10 @@
-import Story from './story';
-import { loadBookBanData } from '@/utils/loadBookBanData';
+import { notFound } from 'next/navigation';
 
-const zoomBookIndex = 3;
-const zoomBookTitle = 'esperanza rising';
+// Temporarily disabled until the private book-bans dataset is restored.
+// import Story from './story';
+// import { loadBookBanData } from '@/utils/loadBookBanData';
+// const zoomBookIndex = 3;
+// const zoomBookTitle = 'esperanza rising';
 
 export const metadata = {
 	title: 'Book Bans Draft',
@@ -12,7 +14,10 @@ export const metadata = {
 	},
 };
 
-export default async function BookBansDraftPage() {
+export default function BookBansDraftPage() {
+	notFound();
+
+	/* Restore together with the imports and constants above:
 	const { books, eventCount } = await loadBookBanData();
 	const zoomBook = books.find(
 		(book) => book.title.toLowerCase() === zoomBookTitle
@@ -21,4 +26,5 @@ export default async function BookBansDraftPage() {
 	if (zoomBook) orderedBooks.splice(zoomBookIndex, 0, zoomBook);
 
 	return <Story books={orderedBooks} eventCount={eventCount} />;
+	*/
 }

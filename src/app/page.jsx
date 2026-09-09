@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import styles from "./home.module.css";
 
 const WAPO_PROJECTS = [
   {
@@ -159,31 +159,6 @@ const SELECTED_WORK = [
 ];
 
 export default function Home() {
-  const [hz, setHz] = useState(440);
-  const isDraggingRef = useRef(false);
-  const trailRef = useRef(null);
-
-  useEffect(() => {
-    let raf = null;
-    const handleMove = (event) => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        const h = window.innerHeight || 1;
-        const norm = 1 - Math.min(Math.max(event.clientY / h, 0), 1);
-        const min = 20;
-        const max = 20000;
-        const value = Math.round(min * Math.pow(max / min, norm));
-        setHz(value);
-        raf = null;
-      });
-    };
-
-    window.addEventListener("mousemove", handleMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMove);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
   const handleVideoEnter = (event) => {
     const video = event.currentTarget.querySelector("video");
     if (!video) return;
@@ -209,139 +184,37 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-zinc-50 font-sans dark:bg-black">
+    <div className={styles.page}>
       <main
-        className="relative flex h-screen w-full flex-col items-center justify-center px-0 bg-white dark:bg-black cursor-crosshair touch-none"
-        onPointerDown={(event) => {
-          if (event.target.closest(".seal-link")) return;
-          isDraggingRef.current = true;
-          if (event.currentTarget.setPointerCapture) {
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }
-        }}
-        onPointerUp={(event) => {
-          if (event.target.closest(".seal-link")) return;
-          isDraggingRef.current = false;
-          if (event.currentTarget.releasePointerCapture) {
-            event.currentTarget.releasePointerCapture(event.pointerId);
-          }
-        }}
-        onPointerLeave={(event) => {
-          isDraggingRef.current = false;
-        }}
-        onPointerMove={(event) => {
-          if (!isDraggingRef.current || !trailRef.current) return;
-          const dot = document.createElement("span");
-          dot.className = "iridescent-trail";
-          dot.style.left = `${event.clientX}px`;
-          dot.style.top = `${event.clientY}px`;
-          trailRef.current.appendChild(dot);
-          window.setTimeout(() => {
-            dot.remove();
-          }, 900);
-        }}
-        onTouchStart={(event) => {
-          if (event.target.closest(".seal-link")) return;
-          isDraggingRef.current = true;
-        }}
-        onTouchEnd={() => {
-          isDraggingRef.current = false;
-        }}
-        onTouchMove={(event) => {
-          event.preventDefault();
-          if (!isDraggingRef.current || !trailRef.current) return;
-          const touch = event.touches[0];
-          if (!touch) return;
-          const dot = document.createElement("span");
-          dot.className = "iridescent-trail";
-          dot.style.left = `${touch.clientX}px`;
-          dot.style.top = `${touch.clientY}px`;
-          trailRef.current.appendChild(dot);
-          window.setTimeout(() => {
-            dot.remove();
-          }, 900);
-        }}
-      >
-        <div ref={trailRef} className="trail-layer" aria-hidden="true" />
-        <div className="relative z-10 flex h-full w-full flex-col items-center justify-center -translate-y-[10%] sm:translate-y-0">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            <a
-              className="title playfair-display select-none peer"
-              href="/"
-              aria-label="Home"
-            >
-              Rekha Tenjarla
-            </a>
-          </h1>
-        </div>
-        <div className="absolute left-2 top-4 z-20 font-mono text-xs font-semibold uppercase tracking-[0.3em] text-zinc-600 dark:text-zinc-400 pl-2">
-          λ {hz.toLocaleString()} Hz
-          <span className="ml-3 opacity-0 transition-opacity duration-200 peer-hover:opacity-100">
-            drag
-          </span>
-        </div>
-        <button
-          type="button"
-          aria-label="Jump to about section"
-          className="seal-link group absolute bottom-10 z-20 inline-flex items-center justify-center text-zinc-800 dark:text-zinc-200 pointer-events-auto sm:bottom-10 bottom-[18%]"
-          onPointerDown={(event) => {
-            event.stopPropagation();
-          }}
-          onClick={() => {
-            const target = document.getElementById("about");
-            if (!target) return;
-            const top = target.getBoundingClientRect().top + window.scrollY;
-            window.scrollTo({ top, behavior: "smooth" });
-          }}
-          onPointerUp={() => {
-            const target = document.getElementById("about");
-            if (!target) return;
-            const top = target.getBoundingClientRect().top + window.scrollY;
-            window.scrollTo({ top, behavior: "smooth" });
-          }}
-        >
-          <span className="seal-outer" aria-hidden="true"></span>
-          <span className="seal-inner" aria-hidden="true"></span>
-          <span className="seal-bar" aria-hidden="true"></span>
-          <span className="seal-arrow">↓</span>
-        </button>
-        {null}
-      </main>
-      <section
         id="about"
-        className="w-full max-w-5xl px-6 pb-24 pt-12 text-black dark:text-zinc-50 scroll-mt-12 sm:px-12 lg:px-16"
+        className={styles.main}
       >
-        <h2 className="text-sm uppercase tracking-[0.2em] text-zinc-600">
-          About
-        </h2>
-        <p className="mt-4 text-base leading-7 text-zinc-700 dark:text-zinc-300">
-          I am a senior creative technologist, still technically employed by{" "}
-          <a
-            href="https://www.washingtonpost.com/people/rekha-tenjarla/"
-            className="underline"
-          >
-            The Washington Post
-          </a>{" "}
-          until May. Previously, I worked at The New Yorker and The Atlantic.
+        <h1 className={styles.name}>
+          Rekha Tenjarla
+        </h1>
+        <p className={styles.lead}>
+          I’m a creative technologist working across storytelling, interaction, and systems.
         </p>
-        <p className="mt-3 text-base leading-7 text-zinc-700 dark:text-zinc-300">
-          I've been called a software engineer, a designer, and other things,
-          but "creative technologist" feels most accurate. I'm a technical
-          generalist—this site runs on a VPS I manage myself—but I'm most
-          interested in interactive experiences, storytelling, and visualizing
-          sound.
+        <p className={styles.lead}>
+          Currently, I work at{" "}
+          <a href="https://www.fathom.info/about/#team"><span className={styles.organization}>Fathom Information Design</span></a>.
+          Before that, I spent a decade designing, developing, and reporting
+          interactive news stories at{" "}
+          <a href="https://www.washingtonpost.com/people/rekha-tenjarla/"><span className={styles.organization}>The Washington Post</span></a>,{" "}
+          <span className={styles.organization}>The New Yorker</span>, and{" "}
+          <span className={styles.organization}>The Atlantic</span>.
         </p>
-        <p className="mt-3 text-base leading-7 text-zinc-700 dark:text-zinc-300">
-          See my experiments{" "}
+        <p className={styles.experiments}>
+          See my sound experiments{" "}
           <a href="/experiments" className="underline">
             here
           </a>
           .
         </p>
 
-        <h3 className="mt-10 text-sm uppercase tracking-[0.2em] text-zinc-600">
-          Selected work
-        </h3>
+        <h2 className={styles.sectionTitle}>
+          Selected Work
+        </h2>
         <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
           {SELECTED_WORK.map((project) => (
             <a
@@ -372,16 +245,16 @@ export default function Home() {
                   />
                 </div>
               </div>
-              <div className="px-4 py-3 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+              <div className={`${styles.caption} ${styles.selectedCaption}`}>
                 {project.title}
               </div>
             </a>
           ))}
         </div>
 
-        <h3 className="mt-12 text-sm uppercase tracking-[0.2em] text-zinc-600">
+        <h2 className={styles.sectionTitle}>
           Projects
-        </h3>
+        </h2>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PROJECTS.map((project) => (
             <a
@@ -403,15 +276,15 @@ export default function Home() {
                   loading="lazy"
                 />
               </div>
-              <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 transition duration-200 group-hover:opacity-100">
-                <span className="px-4 py-3 text-sm font-medium text-white">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 opacity-0 transition duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                <div className={styles.caption}>
                   {project.title}
-                </span>
+                </div>
               </div>
             </a>
           ))}
         </div>
-      </section>
+      </main>
     </div>
   );
 }
