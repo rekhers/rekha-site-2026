@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "./home.module.css";
+import Portrait from "../components/Portrait";
 
 const WAPO_PROJECTS = [
   {
@@ -192,16 +193,19 @@ export default function Home() {
         <h1 className={styles.name}>
           Rekha Tenjarla
         </h1>
+        <div className={styles.introduction}>
+        <div>
         <p className={styles.lead}>
           I’m a creative technologist working across storytelling, interaction, and systems.
         </p>
-        <p className={styles.lead}>
+        <p className={`${styles.lead} ${styles.employment}`}>
           Currently, I work at{" "}
-          <a href="https://www.fathom.info/about/#team"><span className={styles.organization}>Fathom Information Design</span></a>.
+          <a href="https://www.fathom.info/about/#team"><span className={`${styles.organization} ${styles.keepTogether}`}>Fathom Information Design</span></a>.
+          <br />
           Before that, I spent a decade designing, developing, and reporting
           interactive news stories at{" "}
           <a href="https://www.washingtonpost.com/people/rekha-tenjarla/"><span className={styles.organization}>The Washington Post</span></a>,{" "}
-          <span className={styles.organization}>The New Yorker</span>, and{" "}
+          <span className={`${styles.organization} ${styles.keepTogether}`}>The New Yorker</span>, and{" "}
           <span className={styles.organization}>The Atlantic</span>.
         </p>
         <p className={styles.experiments}>
@@ -211,6 +215,10 @@ export default function Home() {
           </a>
           .
         </p>
+
+        </div>
+        <Portrait />
+        </div>
 
         <h2 className={styles.sectionTitle}>
           Selected Work
@@ -284,6 +292,10 @@ export default function Home() {
             </a>
           ))}
         </div>
+        <footer className={styles.contact}>
+          Get in touch{" "}
+          <a href="mailto:rekha.tenjarla@gmail.com">rekha.tenjarla@gmail.com</a>.
+        </footer>
       </main>
     </div>
   );

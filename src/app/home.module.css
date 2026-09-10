@@ -14,7 +14,7 @@
 }
 .name, .lead, .bio, .experiments {
   max-width: 49rem;
-  font-size: clamp(1.25rem, 2.65vw, 2.125rem);
+  font-size: clamp(1.128125rem, 2.391625vw, 1.9178125rem);
   line-height: 1.5;
   letter-spacing: -0.015em;
   text-wrap: pretty;
@@ -55,3 +55,91 @@
 .lead a { text-decoration-line: underline; }
 
 .selectedCaption { color: #191919; }
+
+.contact {
+  margin-top: clamp(3rem, 6vw, 5rem);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #454545;
+}
+.contact a {
+  color: #3f46bd;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.keepTogether { white-space: nowrap; }
+
+.employment { max-width: 49rem; }
+
+.introduction { display: grid; grid-template-columns: minmax(0, 1fr) 30rem; align-items: center; gap: clamp(2rem, 4vw, 3.5rem); }
+.portrait { position: relative; width: 17.5rem; max-width: 100%; justify-self: center; margin: 0.5rem 0 0; }
+.portraitButton { position: relative; display: block; width: 100%; aspect-ratio: 3870 / 5796; padding: 0; border: 0; background: transparent; cursor: pointer; transition: box-shadow 600ms ease; }
+.portraitPhoto { display: block; width: 100%; height: auto; opacity: 0; transition: opacity 800ms ease; }
+.crayon { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; transform: rotate(20deg) scale(2); transition: opacity 650ms ease, transform 800ms ease; }
+.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"]) { box-shadow: 0 0 0 1px rgb(101 72 237 / 35%), 0 0 28px rgb(101 72 237 / 24%), 0 0 65px rgb(130 70 230 / 14%); }
+.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"]) .portraitPhoto { opacity: 1; }
+.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"]) .crayon { opacity: 0; transform: rotate(20deg) scale(2.07); }
+.portraitButton:focus-visible { outline: 2px solid #3f46bd; outline-offset: 5px; }
+.portraitCaption { position: relative; isolation: isolate; width: max-content; max-width: 100%; margin: 1rem auto 0; padding: 0.35rem 0.25rem 0.6rem; color: #3f46bd; font-size: 0.875rem; line-height: 1.5; text-align: center; opacity: 0; transition: opacity 500ms ease; }
+.portrait:has(.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"])) .portraitCaption { opacity: 1; }
+/* Reserve the full drawing footprint, including its rotated 2x scale. */
+.introduction > * { min-width: 0; }
+@media (max-width: 1199px), (max-aspect-ratio: 1/1) {
+  .introduction { grid-template-columns: minmax(0, 1fr); gap: 3rem; }
+  .portrait { width: min(15rem, 46%); justify-self: center; margin-inline: auto; }
+}
+@media (max-width: 480px) {
+  .introduction .keepTogether { white-space: normal; }
+  .portraitCaption { max-width: none; left: 50%; transform: translateX(-50%); margin-inline: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portraitButton, .portraitPhoto, .crayon, .portraitCaption { transition: none; }
+}
+
+.crayonTrace { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.crayonTrace[data-ready="true"] { animation: crayonDraw 1.4s cubic-bezier(0.65, 0, 0.35, 1) 100ms both; }
+.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"]) .crayonTrace[data-ready="true"] {
+  animation: none;
+}
+@keyframes crayonDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .crayonTrace, .crayonTrace[data-ready="true"] { animation: none; stroke-dashoffset: 0; }
+}
+
+
+.portraitCaption span { position: relative; font-weight: 400; font-size: 0.8125rem; letter-spacing: 0.08em; }
+
+.portraitCaption span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.4rem;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 550ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+.portrait:has(.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"])) .portraitCaption span::after {
+  transform: scaleX(1);
+  transition-delay: 200ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .portraitCaption span::after { transition: none; }
+}
+
+@media (min-width: 1200px) and (min-aspect-ratio: 1/1) {
+  .portrait {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .portraitButton { position: static; flex-shrink: 0; }
+  .crayon { top: 0; bottom: auto; height: auto; aspect-ratio: 3870 / 5796; }
+}
+

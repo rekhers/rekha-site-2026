@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # -----------------------------
 # Reliable deploy script for rekha-site
 # -----------------------------
