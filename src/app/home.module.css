@@ -15,7 +15,7 @@
 .name, .lead, .bio, .experiments {
   max-width: 49rem;
   font-size: clamp(1.128125rem, 2.391625vw, 1.9178125rem);
-  line-height: 1.5;
+  line-height: 1.55;
   letter-spacing: -0.015em;
   text-wrap: pretty;
 }
