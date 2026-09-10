@@ -82,10 +82,10 @@
 .portrait { position: relative; width: 17.5rem; max-width: 100%; justify-self: center; margin: 0.5rem 0 0; }
 .portraitButton { position: relative; display: block; width: 100%; aspect-ratio: 3870 / 5796; padding: 0; border: 0; background: transparent; cursor: pointer; transition: box-shadow 600ms ease; }
 .portraitPhoto { display: block; width: 100%; height: auto; opacity: 0; transition: opacity 800ms ease; }
-.crayon { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; transform: rotate(20deg) scale(2); transition: opacity 650ms ease, transform 800ms ease; }
+.crayon { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; transform: rotate(-20deg) scale(2); transition: opacity 650ms ease, transform 800ms ease; }
 .portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"]) { box-shadow: 0 0 0 1px rgb(101 72 237 / 35%), 0 0 28px rgb(101 72 237 / 24%), 0 0 65px rgb(130 70 230 / 14%); }
 .portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"]) .portraitPhoto { opacity: 1; }
-.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"]) .crayon { opacity: 0; transform: rotate(20deg) scale(2.07); }
+.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"]) .crayon { opacity: 0; transform: rotate(-20deg) scale(2.07); }
 .portraitButton:focus-visible { outline: 2px solid #3f46bd; outline-offset: 5px; }
 .portraitCaption { position: relative; isolation: isolate; width: max-content; max-width: 100%; margin: 1rem auto 0; padding: 0.35rem 0.25rem 0.6rem; color: #3f46bd; font-size: 0.875rem; line-height: 1.5; text-align: center; opacity: 0; transition: opacity 500ms ease; }
 .portrait:has(.portraitButton:is([data-hovered="true"], :focus-visible, [data-revealed="true"])) .portraitCaption { opacity: 1; }
