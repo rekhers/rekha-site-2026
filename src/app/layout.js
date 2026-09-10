@@ -12,7 +12,7 @@ const luciole = localFont({
   ],
   variable: "--font-luciole",
   preload: true,
-  display: "optional",
+  display: "block",
   adjustFontFallback: "Arial",
 });
 
