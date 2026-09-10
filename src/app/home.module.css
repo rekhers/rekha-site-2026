@@ -143,3 +143,20 @@
   .crayon { top: 0; bottom: auto; height: auto; aspect-ratio: 3870 / 5796; }
 }
 
+
+@media (max-width: 600px) {
+  .name, .lead, .bio, .experiments {
+    font-size: clamp(1.18453125rem, 2.51120625vw, 2.013703125rem);
+  }
+  .lead, .bio { margin-bottom: 1rem; }
+  .experiments { margin-top: 1rem; }
+}
+
+@media (max-width: 600px) {
+  .introduction { row-gap: 0; }
+  .introText { display: contents; }
+  .introText > .lead:first-child { order: 0; }
+  .introduction > .portrait { order: 1; margin-block: 1.5rem 2rem; }
+  .introText > .employment { order: 2; }
+  .introText > .experiments { order: 3; margin-top: 0; }
+}

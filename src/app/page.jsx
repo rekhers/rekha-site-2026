@@ -194,7 +194,7 @@ export default function Home() {
           Rekha Tenjarla
         </h1>
         <div className={styles.introduction}>
-        <div>
+        <div className={styles.introText}>
         <p className={styles.lead}>
           I’m a creative technologist working across storytelling, interaction, and systems.
         </p>
