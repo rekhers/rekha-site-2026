@@ -28,7 +28,7 @@ export default function Portrait() {
         onPointerLeave={() => setHovered(false)}
         onClick={() => setRevealed(!revealed)}
       >
-        <Image className={styles.portraitPhoto} quality={90} src="/bio-pic.jpg" alt="Rekha Tenjarla smiling, seated on a couch" width={3870} height={5796} sizes="(max-width: 600px) 46vw, (max-width: 1199px) 240px, 280px" />
+        <Image className={styles.portraitPhoto} quality={95} src="/bio-pic.jpg" alt="Rekha Tenjarla smiling, seated on a couch" width={3870} height={5796} sizes="(max-width: 600px) 46vw, (max-width: 1199px) 240px, 280px" />
         <svg className={styles.crayon} viewBox="160 560 1500 1150" aria-hidden="true">
           <defs>
             <filter id={`${maskId}-purple`} colorInterpolationFilters="sRGB">
