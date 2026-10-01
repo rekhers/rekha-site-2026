@@ -7,14 +7,14 @@ const experiments = [
     number: "01",
     title: "Polyphonic Synth",
     href: "/experiments/synth-lab",
-    description: "Play a few notes. Shape their attack, filter the sound, and add effects.",
+    description: "Learn your way around ADSR.",
     note: "Make sound",
   },
   {
     number: "02",
     title: "Live Spectrogram",
     href: "/experiments/spectrogram",
-    description: "See your voice, a song, or the room around you unfold in three dimensions.",
+    description: "See sound from your microphone in 3D.",
     note: "Microphone required",
   },
 ];

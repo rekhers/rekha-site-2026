@@ -1,0 +1,326 @@
+.museum {
+  position: fixed;
+  inset: 0;
+  background: #c5bfb0;
+  color: #292823;
+  font-family: Arial, sans-serif;
+}
+.museum canvas {
+  touch-action: none;
+}
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 25px 32px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.13em;
+  pointer-events: none;
+}
+.header a {
+  pointer-events: auto;
+  text-decoration: none;
+}
+.header small {
+  display: block;
+  text-align: right;
+  margin-top: 7px;
+  opacity: 0.6;
+  letter-spacing: 0.04em;
+}
+.entry {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgb(231 225 212 / 88%);
+}
+.entry h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(64px, 10vw, 130px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  margin: 20px 0 30px;
+}
+.entry p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.entry > p:first-child {
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+.entry button,
+.label button {
+  background: #34392f;
+  color: #fff;
+  border: 0;
+  padding: 16px 26px;
+  margin: 28px 0 20px;
+  cursor: pointer;
+}
+.entry small {
+  font-size: 11px;
+  line-height: 1.8;
+  opacity: 0.7;
+}
+.controls {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+.controls span,
+.controls button {
+  padding: 10px 14px;
+  background: #eee9ded9;
+  border: 0;
+}
+.label {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  border: 0;
+  color: #292823;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  width: min(460px, calc(100% - 40px));
+  background: #f4efe4;
+  padding: 36px;
+  box-shadow: 0 20px 100px #0005;
+}
+.label h2 {
+  font:
+    36px Georgia,
+    serif;
+  margin: 20px 0;
+}
+.label p {
+  line-height: 1.7;
+  font-size: 15px;
+}
+.label small {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+.label .note {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #716b60;
+}
+@media (max-width: 600px) {
+  .header {
+    padding: 18px;
+  }
+  .controls span {
+    max-width: 70%;
+  }
+}
+
+.label::backdrop {
+  background: rgb(30 28 22 / 38%);
+}
+.label .close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  margin: 0;
+  padding: 6px;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  color: #292823;
+  font-size: 28px;
+  line-height: 1;
+}
+.contents {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 0;
+}
+.contents li {
+  border-top: 1px solid #d2cabb;
+}
+.contents li:last-child {
+  border-bottom: 1px solid #d2cabb;
+}
+.contents button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+  margin: 0;
+  padding: 16px 0;
+  background: transparent;
+  color: #292823;
+}
+.contents button span:first-child {
+  font-size: 10px;
+  opacity: 0.6;
+}
+.contents button span:last-child {
+  margin-left: auto;
+}
+.label button:focus-visible {
+  outline: 2px solid #71664c;
+  outline-offset: 3px;
+}
+
+.museum {
+  font-family: var(--font-luciole), Arial, sans-serif;
+}
+.entry h1,
+.label h2,
+.wallTitle h2,
+.contents h3 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 400;
+}
+.wallTitle {
+  width: 540px;
+  text-align: center;
+  color: #292823;
+  pointer-events: none;
+}
+.wallTitle small {
+  font-size: 13px;
+  letter-spacing: 0.25em;
+}
+.wallTitle h2 {
+  font-size: 48px;
+  line-height: 1.12;
+  margin: 14px 0;
+}
+.wallTitle p {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.contents h3 {
+  font-size: 25px;
+  line-height: 1.25;
+  margin: 20px 0 8px;
+}
+.contents h3 small {
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  margin-right: 8px;
+}
+.contents p {
+  font-size: 12px;
+  color: #716b60;
+  margin: 0 0 8px;
+}
+.controls span {
+  line-height: 1.8;
+}
+
+.objectPlacard {
+  width: 230px;
+  padding: 16px;
+  background: #eee9de;
+  color: #292823;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+}
+.objectPlacard small {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+.objectPlacard strong {
+  display: block;
+  font:
+    21px Georgia,
+    serif;
+  margin: 8px 0;
+}
+.objectPlacard span {
+  font-size: 11px;
+}
+.note a {
+  text-decoration: underline;
+}
+
+.touchMovement,
+.touchHint {
+  display: none;
+}
+@media (any-pointer: coarse) {
+  .touchHint {
+    display: inline;
+  }
+  .keyboardHint {
+    display: none;
+  }
+  .touchMovement {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    z-index: 20;
+    left: max(20px, env(safe-area-inset-left));
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    user-select: none;
+  }
+  .thumbstick {
+    width: 116px;
+    height: 116px;
+    border: 1px solid #fff8;
+    background: #eee9de99;
+    border-radius: 50%;
+    position: relative;
+    touch-action: none;
+  }
+  .thumbstick > span {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.5;
+  }
+  .thumbstick i {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    left: 37px;
+    top: 37px;
+    border-radius: 50%;
+    background: #34392fcc;
+    transform: translate(var(--stick-x, 0px), var(--stick-y, 0px));
+    pointer-events: none;
+  }
+  .touchMovement small {
+    font-size: 10px;
+    background: #eee9ded9;
+    padding: 5px 8px;
+  }
+  .controls {
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    left: auto;
+    right: max(18px, env(safe-area-inset-right));
+    z-index: 20;
+  }
+  .controls > span {
+    display: none;
+  }
+  .controls button {
+    min-height: 44px;
+  }
+  .entry {
+    padding: 24px;
+  }
+}

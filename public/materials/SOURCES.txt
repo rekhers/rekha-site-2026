@@ -1,0 +1,6 @@
+Marble012: https://ambientcg.com/view?id=Marble012
+WoodFloor043: https://ambientcg.com/view?id=WoodFloor043
+Source: ambientCG. License: CC0 https://docs.ambientcg.com/license/
+1K JPG color, OpenGL normal, and roughness maps.
+
+Concrete033: https://ambientcg.com/view?id=Concrete033 (CC0)
