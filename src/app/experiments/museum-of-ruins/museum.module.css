@@ -272,7 +272,8 @@
     gap: 10px;
     position: absolute;
     z-index: 20;
-    left: max(20px, env(safe-area-inset-left));
+    left: 50%;
+    transform: translateX(-50%);
     bottom: calc(24px + env(safe-area-inset-bottom));
     user-select: none;
   }

@@ -29,8 +29,12 @@ export default function Thumbstick({ movementRef }) {
     const y = (event.clientY - bounds.top - bounds.height / 2) / 38;
     const length = Math.hypot(x, y);
     const scale = Math.max(1, length);
+    // Small dead zone; reach full speed before the thumb hits the outer rim.
+    const strength = Math.min(1, Math.max(0, (length - 0.06) / 0.66));
     movementRef.current =
-      length < 0.12 ? { x: 0, y: 0 } : { x: x / scale, y: -y / scale };
+      length > 0
+        ? { x: (x / length) * strength, y: (-y / length) * strength }
+        : { x: 0, y: 0 };
     event.currentTarget.style.setProperty("--stick-x", `${(x / scale) * 38}px`);
     event.currentTarget.style.setProperty("--stick-y", `${(y / scale) * 38}px`);
   };
