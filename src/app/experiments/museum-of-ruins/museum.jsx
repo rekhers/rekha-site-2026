@@ -1,12 +1,33 @@
 "use client";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { exhibits, rooms, classroomDesk } from "./exhibits";
 import styles from "./museum.module.css";
 import Thumbstick from "./thumbstick";
 const Room = dynamic(() => import("./room"), { ssr: false });
 export default function Museum() {
-  const [roomIndex, setRoomIndex] = useState(0);
+  const router = useRouter();
+  const [exiting, setExiting] = useState(false);
+  useEffect(() => {
+    if (!exiting) return;
+    const timer = setTimeout(
+      () => router.push("/"),
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? 150
+        : 1400,
+    );
+    return () => clearTimeout(timer);
+  }, [exiting, router]);
+  const [destination, setDestination] = useState(null);
+  const navigateToExhibit = (item) => {
+    movementRef.current = { x: 0, y: 0 };
+    setDestination({ item });
+    setExhibit(null);
+    setPaused(false);
+    document.activeElement?.blur();
+  };
+  const [roomIndex, setRoomIndex] = useState(-1);
   const [entered, setEntered] = useState(false);
   const [exhibit, setExhibit] = useState(null);
   const [paused, setPaused] = useState(false);
@@ -28,23 +49,31 @@ export default function Museum() {
   return (
     <main className={styles.museum}>
       <Room
+        destination={destination}
         movementRef={movementRef}
         entered={entered}
         onRoomChange={setRoomIndex}
-        active={entered && !modalOpen}
+        active={entered && !modalOpen && !exiting}
+        onExit={() => setExiting(true)}
         onSelect={(item) => {
           if (entered && !modalOpen) setExhibit(item);
         }}
       />
+      {exiting && (
+        <div
+          className={styles.exitFade}
+          role="status"
+          aria-label="Returning to portfolio"
+        />
+      )}
       <header className={styles.header}>
-        <a href="/experiments">← Experiments</a>
         <span>
           MUSEUM OF RUINS <small>Five rooms · An exhibition in progress</small>
         </span>
       </header>
       {!entered && (
         <section className={styles.entry}>
-          <p>A walk through what remains</p>
+          <p>An exploration of loss</p>
           <h1>
             Museum
             <br />
@@ -69,16 +98,21 @@ export default function Museum() {
       {entered && (
         <footer className={styles.controls}>
           <span>
-            {rooms[roomIndex].number} / 05 · {rooms[roomIndex].title}
+            {roomIndex < 0
+              ? "Museum of Ruins · Passage"
+              : `${rooms[roomIndex].number} / 05 · ${rooms[roomIndex].title}`}
             <br />↑ ↓ walk &nbsp; ← → turn &nbsp; · &nbsp; Drag to look
           </span>
           <button onClick={() => setPaused(true)}>Pause</button>
         </footer>
       )}
-      {entered && !modalOpen && <Thumbstick movementRef={movementRef} />}
+      {entered && !modalOpen && !exiting && (
+        <Thumbstick movementRef={movementRef} />
+      )}
       <dialog
         ref={dialog}
         className={styles.label}
+        data-dark={exhibit ? exhibit.roomId === 1 : roomIndex === 1}
         aria-labelledby="museum-panel-title"
         onCancel={(event) => {
           event.preventDefault();
@@ -138,7 +172,7 @@ export default function Museum() {
           <>
             <small>EXPLORATION PAUSED</small>
             <h2 id="museum-panel-title">The collection</h2>
-            <p>Browse the placards, or return to where you left off.</p>
+            <p>Choose an exhibit to go there, or resume where you left off.</p>
             <ol className={styles.contents}>
               {rooms.map((room) => (
                 <li key={room.id}>
@@ -151,7 +185,7 @@ export default function Museum() {
                     .map((item) => (
                       <button
                         key={item.number}
-                        onClick={() => setExhibit(item)}
+                        onClick={() => navigateToExhibit(item)}
                       >
                         <span>{item.number}</span>
                         {item.title}

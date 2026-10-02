@@ -15,7 +15,7 @@
   right: 0;
   padding: 25px 32px;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   font-size: 11px;
   letter-spacing: 0.13em;
   pointer-events: none;
@@ -33,6 +33,7 @@
 }
 .entry {
   position: absolute;
+  z-index: 20;
   inset: 0;
   display: flex;
   flex-direction: column;
@@ -323,5 +324,287 @@
   }
   .entry {
     padding: 24px;
+  }
+}
+
+.label[data-dark="true"] {
+  background: #111216;
+  color: white;
+}
+.label[data-dark="true"] .close,
+.label[data-dark="true"] .note,
+.label[data-dark="true"] .contents button,
+.label[data-dark="true"] .contents p {
+  color: #eee;
+}
+.television {
+  width: 640px;
+  height: 360px;
+  background: black;
+  color: white;
+}
+.television iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.television > button {
+  width: 100%;
+  height: 100%;
+  background: #101216;
+  color: white;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  cursor: pointer;
+}
+.television small {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+.television strong {
+  font:
+    48px Georgia,
+    serif;
+  font-weight: 400;
+}
+.screenCredit {
+  color: white;
+  font:
+    12px Arial,
+    sans-serif;
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+}
+.screenCredit a {
+  text-decoration: underline;
+}
+.screenCredit button {
+  background: none;
+  color: white;
+  border: 1px solid #777;
+  padding: 5px 10px;
+}
+
+.television > .hearingPoster {
+  background-image:
+    linear-gradient(to top, rgb(0 0 0 / 85%), transparent 75%),
+    url("https://imgix.bustle.com/scary-mommy/2018/09/GettyImages-1041966422.jpg?crop=faces&dpr=2&fit=crop&h=233&w=414");
+  background-size: cover;
+  background-position: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 24px;
+  text-shadow: 0 1px 5px #000;
+}
+.screenCredit {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.entry button {
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+@media (hover: hover) {
+  .entry button:hover {
+    background: #505747;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgb(30 33 26 / 18%);
+  }
+}
+.entry button:focus-visible {
+  outline: 2px solid #34392f;
+  outline-offset: 5px;
+  background: #505747;
+}
+.entry button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .entry button {
+    transition: none;
+    transform: none;
+  }
+  .entry button:hover {
+    transform: none;
+  }
+}
+
+.classroomPoster {
+  display: block;
+  position: relative;
+  background: #f8f8f0;
+  padding: 5px;
+  box-shadow: 1px 3px 7px #0003;
+  text-decoration: none;
+}
+.classroomPoster::before,
+.classroomPoster::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  width: 56px;
+  height: 24px;
+  background: #d8cba6bb;
+}
+.classroomPoster::before {
+  left: 15px;
+  transform: rotate(-8deg);
+}
+.classroomPoster::after {
+  right: 15px;
+  transform: rotate(6deg);
+}
+.classroomPoster small {
+  display: block;
+  font:
+    9px Arial,
+    sans-serif;
+  color: #514d45;
+  padding: 5px;
+}
+
+.openingPlacard {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: min(660px, calc(100% - 40px));
+  max-height: calc(100dvh - 180px);
+  display: flex;
+  flex-direction: column;
+  padding: 48px;
+  background: #f4efe4;
+  backdrop-filter: blur(12px);
+  color: #292823;
+  border: 1px solid #fff7;
+  box-shadow: 0 15px 50px #0002;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 450ms ease,
+    visibility 450ms;
+}
+.openingPlacard[data-visible="true"] {
+  opacity: 1;
+  visibility: visible;
+}
+.openingText {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.openingText p {
+  font:
+    17px/1.65 var(--font-playfair),
+    Georgia,
+    serif;
+  margin: 0 0 20px;
+}
+.openingClose {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 26px;
+  cursor: pointer;
+}
+.openingPlacard > small {
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  opacity: 0.65;
+}
+@media (any-pointer: coarse) {
+  .openingPlacard {
+    top: 80px;
+    transform: translateX(-50%);
+    max-height: calc(100dvh - 290px);
+    padding: 46px 28px 30px;
+  }
+  .openingText p {
+    font-size: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .openingPlacard {
+    transition: none;
+  }
+}
+
+.wallStatement {
+  width: 650px;
+  color: #302e29;
+  font-family:
+    Baskerville, "Baskerville Old Face", "Palatino Linotype", Palatino, Georgia,
+    serif;
+  padding: 28px;
+  pointer-events: none;
+}
+.wallStatement > small {
+  font:
+    10px Arial,
+    sans-serif;
+  letter-spacing: 0.2em;
+}
+.wallStatement h2 {
+  font:
+    400 42px/1.15 Baskerville,
+    "Baskerville Old Face",
+    "Palatino Linotype",
+    Palatino,
+    Georgia,
+    serif;
+  letter-spacing: -0.02em;
+  margin: 15px 0 25px;
+}
+.wallStatement p {
+  font:
+    400 20px/1.5 Baskerville,
+    "Baskerville Old Face",
+    "Palatino Linotype",
+    Palatino,
+    Georgia,
+    serif;
+  margin-bottom: 22px;
+}
+.wallStatement footer {
+  font:
+    11px/1.4 Arial,
+    sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 24px;
+}
+
+.exitFade {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  background: #fff;
+  animation: leaveMuseum 1.2s ease-in-out both;
+}
+@keyframes leaveMuseum {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .exitFade {
+    animation: none;
   }
 }

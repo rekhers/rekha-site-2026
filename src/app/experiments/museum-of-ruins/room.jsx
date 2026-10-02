@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, useGLTF, useTexture, ContactShadows } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -10,14 +11,36 @@ import {
   SRGBColorSpace,
 } from "three";
 
-import { exhibits, rooms, canWalk, classroomDesk } from "./exhibits";
+import {
+  exhibits,
+  rooms,
+  canWalk,
+  deskCluster,
+  passages,
+  inRoom,
+  nearEntrance,
+  roomWalls,
+  entrance,
+  exitHall,
+} from "./exhibits";
 import { surfaceTexture } from "./materials";
+import Statement from "./statement";
+import { entranceDaylight } from "./daylight";
 import styles from "./museum.module.css";
 
-function Navigator({ active, movementRef, onRoomChange, onVisibleRoomsChange }) {
+function Navigator({
+  entered,
+  active,
+  movementRef,
+  onRoomChange,
+  destination,
+  onVisibleRoomsChange,
+  onExit,
+}) {
+  const lastDestination = useRef(null);
   const keys = useRef(new Set());
-  const currentRoom = useRef(0);
-  const visibilityKey = useRef("0");
+  const currentRoom = useRef(-1);
+  const visibilityKey = useRef("");
 
   const yaw = useRef(0),
     pitch = useRef(0),
@@ -93,7 +116,31 @@ function Navigator({ active, movementRef, onRoomChange, onVisibleRoomsChange }) 
   }, [active, movementRef]);
 
   useFrame(({ camera }, dt) => {
+    if (!entered) {
+      camera.position.set(entrance.x, 1.65, 3);
+      camera.rotation.set(0, 0, 0, "YXZ");
+      yaw.current = 0;
+      pitch.current = 0;
+      return;
+    }
     if (!active) return;
+    if (destination && destination !== lastDestination.current) {
+      lastDestination.current = destination;
+      const { item } = destination;
+      const room = rooms[item.roomId];
+      let target = item.position || [-2.6, 1, -5];
+      if (item.number === "02.1") target = [room.x - 5.32, 2.6, room.front - 5];
+      // The classroom's original study objects have been replaced by posters.
+      if (item.number === "01.1") target = [-5.84, 2.5, -4];
+      if (item.number === "01.2") target = [5.84, 2.5, -1.5];
+      const x = room.x;
+      const z = target[2];
+      camera.position.set(x, 1.65, z);
+      yaw.current = Math.atan2(x - target[0], z - target[2]);
+      pitch.current = 0;
+      keys.current.clear();
+      drag.current = null;
+    }
     const k = keys.current,
       d = Math.min(dt, 0.05);
     yaw.current +=
@@ -110,26 +157,22 @@ function Navigator({ active, movementRef, onRoomChange, onVisibleRoomsChange }) 
       (-Math.sin(yaw.current) * forward + Math.cos(yaw.current) * side) * speed;
     const dz =
       (-Math.cos(yaw.current) * forward - Math.sin(yaw.current) * side) * speed;
-    const roomIndex = rooms.findIndex(
-      (room) =>
-        camera.position.z <= room.front && camera.position.z >= room.back,
+    const roomIndex = rooms.findIndex((room) =>
+      inRoom(room, camera.position.x, camera.position.z),
     );
-    if (roomIndex >= 0) {
-      const visible = [roomIndex];
-      const room = rooms[roomIndex];
-      if (
-        roomIndex < rooms.length - 1 &&
-        camera.position.z < room.back + 1.8 &&
-        Math.abs(camera.position.x) < 1.8
+    const visible = rooms
+      .filter(
+        (room) =>
+          inRoom(room, camera.position.x, camera.position.z) ||
+          nearEntrance(room, camera.position.x, camera.position.z),
       )
-        visible.push(roomIndex + 1);
-      const key = visible.join(",");
-      if (key !== visibilityKey.current) {
-        visibilityKey.current = key;
-        onVisibleRoomsChange(visible);
-      }
+      .map((room) => room.id);
+    const key = visible.join(",");
+    if (key !== visibilityKey.current) {
+      visibilityKey.current = key;
+      onVisibleRoomsChange(visible);
     }
-    if (roomIndex >= 0 && roomIndex !== currentRoom.current) {
+    if (roomIndex !== currentRoom.current) {
       currentRoom.current = roomIndex;
       onRoomChange(roomIndex);
     }
@@ -137,6 +180,11 @@ function Navigator({ active, movementRef, onRoomChange, onVisibleRoomsChange }) 
       camera.position.x += dx;
     if (canWalk(camera.position.x, camera.position.z + dz))
       camera.position.z += dz;
+    if (
+      Math.abs(camera.position.x - entrance.x) < 0.75 &&
+      camera.position.z >= entrance.front - 0.08
+    )
+      onExit();
   });
   return null;
 }
@@ -172,12 +220,12 @@ function Exhibit({ item, onSelect, textVisible }) {
           <button
             onClick={() => onSelect(item)}
             style={{
-              background: "#eee9de",
+              background: item.roomId === 1 ? "#111216" : "#eee9de",
               border: 0,
               padding: "14px 18px",
               width: 240,
               textAlign: "left",
-              color: "#292823",
+              color: item.roomId === 1 ? "#fff" : "#292823",
               cursor: "pointer",
               fontFamily: "Georgia, serif",
             }}
@@ -199,7 +247,78 @@ function Exhibit({ item, onSelect, textVisible }) {
     </group>
   );
 }
-function SchoolDesk({ onSelect, textVisible }) {
+function ClassroomPosters({ visible }) {
+  if (!visible) return null;
+  const posters = [
+    {
+      title: "READ — Shaquille O’Neal for America’s Libraries",
+      image: "https://melmagazine.com/uploads/2020/07/read_shaq_poster-1.jpg",
+      source: "https://melmagazine.com/en-us/story/shaq-reading-meme",
+      credit: "American Library Association · image via MEL",
+      position: [-5.84, 2.5, -7.5],
+      rotation: [0, Math.PI / 2, 0],
+      width: 345,
+      height: 460,
+    },
+
+    {
+      title: "All Are Welcome",
+      image:
+        "https://cdn11.bigcommerce.com/s-swdvv2w64y/product_images/uploaded_images/ait-allarewelcome.png",
+      source:
+        "https://www.carsondellosa.com/blogs-articles/spread-the-love-inclusivity-in-the-classroom/",
+      credit: "Carson Dellosa Education",
+      position: [-5.84, 2.5, -4],
+      rotation: [0, Math.PI / 2, 0],
+      width: 350,
+      height: 460,
+    },
+    {
+      title: "Well Behaved Women Rarely Make History",
+      image:
+        "https://ih1.redbubble.net/image.2362731660.9738/flat%2C750x%2C075%2Cf-pad%2C750x1000%2Cf8f8f8.jpg",
+      source:
+        "https://www.redbubble.com/i/poster/Vintage-Girl-Well-Behaved-Women-Rarely-Make-History-Poster-by-ArminaNLabrie/78069738/flk2",
+      credit: "ArminaNLabrie / Redbubble",
+      position: [5.84, 2.5, -1.5],
+      rotation: [0, -Math.PI / 2, 0],
+      width: 345,
+      height: 460,
+    },
+  ];
+  return posters.map((poster) => (
+    <Html
+      key={poster.title}
+      transform
+      position={poster.position}
+      rotation={poster.rotation}
+      distanceFactor={2.1}
+      center
+      occlude
+    >
+      <a
+        className={styles.classroomPoster}
+        href={poster.source}
+        target="_blank"
+        rel="noreferrer"
+        style={{ width: poster.width }}
+        aria-label={`${poster.title} — source: ${poster.credit}`}
+      >
+        <Image
+          unoptimized
+          src={poster.image}
+          alt={poster.title}
+          width={poster.width}
+          height={poster.height}
+          style={{ width: "100%", height: poster.height, objectFit: "contain" }}
+        />
+        <small>{poster.credit}</small>
+      </a>
+    </Html>
+  ));
+}
+
+function SchoolDesk() {
   const { scene } = useGLTF("/models/school-desk/school-desk.glb");
   const model = useMemo(() => {
     const copy = scene.clone(true);
@@ -222,47 +341,101 @@ function SchoolDesk({ onSelect, textVisible }) {
     return copy;
   }, [scene]);
 
+  const desks = useMemo(
+    () => deskCluster.map(() => model.clone(true)),
+    [model],
+  );
+
   return (
-    <group position={[-2, 0, -5]}>
-      <group rotation={[0, Math.PI / 5, 0]}>
-        <primitive object={model} />
-      </group>
+    <group>
+      {deskCluster.map((desk, index) => (
+        <group
+          key={index}
+          position={desk.position}
+          rotation={[0, desk.rotation, 0]}
+        >
+          <primitive object={desks[index]} />
+        </group>
+      ))}
       <ContactShadows
-        position={[0, 0.008, 0]}
-        scale={4}
+        position={[-2.6, 0.008, -5]}
+        scale={5}
         opacity={0.45}
         blur={2}
         far={2}
         resolution={256}
         frames={1}
       />
-      <spotLight
-        position={[1, 4.5, 1]}
-        intensity={35}
-        angle={0.45}
-        penumbra={0.7}
-        castShadow
-        target={model}
+      <pointLight
+        position={[-2.6, 4, -5]}
+        intensity={25}
+        distance={8}
+        color="#fff3dd"
       />
-      {textVisible && (
-        <Html
-          position={[1, 0.85, 0.5]}
-          transform
-          rotation={[0, 0, 0]}
-          distanceFactor={2}
-          center
-          occlude
-        >
-          <button
-            className={styles.objectPlacard}
-            onClick={() => onSelect(classroomDesk)}
-          >
-            <small>CLASSROOM / 01.3</small>
-            <strong>School desk and chair</strong>
-            <span>Read the object label ↗</span>
-          </button>
-        </Html>
-      )}
+    </group>
+  );
+}
+
+function HearingScreen({ visible }) {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <group
+      position={[rooms[1].x - 5.32, 2.6, rooms[1].front - 5]}
+      rotation={[0, Math.PI / 2, 0]}
+    >
+      <mesh>
+        <boxGeometry args={[4.4, 2.6, 0.18]} />
+        <meshStandardMaterial color="#080808" roughness={0.4} />
+      </mesh>
+      <Html
+        transform
+        position={[0, 0, 0.11]}
+        distanceFactor={2.65}
+        center
+        occlude
+      >
+        <div className={styles.television}>
+          {playing && visible ? (
+            <iframe
+              title="C-SPAN: Ford and Kavanaugh Senate hearing, September 27, 2018"
+              src="https://www.youtube-nocookie.com/embed/7zVOkb3CdZ0?autoplay=1&playsinline=1"
+              allow="autoplay; encrypted-media; fullscreen"
+              allowFullScreen
+            />
+          ) : (
+            <button
+              className={styles.hearingPoster}
+              onClick={() => setPlaying(true)}
+              aria-label="Play hearing footage: Brett Kavanaugh testifying"
+            >
+              <small>SEPTEMBER 27, 2018 · C-SPAN</small>
+              <strong>The hearing</strong>
+              <span>▶ Play hearing footage</span>
+            </button>
+          )}
+        </div>
+        {visible && (
+          <div className={styles.screenCredit}>
+            <a
+              href="https://www.scarymommy.com/brett-kavanaugh-crying"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Photo: Win McNamee / Getty Images
+            </a>
+            <a
+              href="https://www.washingtonpost.com/video/politics/kavanaugh-we-drank-beer/2018/09/27/5cd36f5c-c293-11e8-9451-e878f96be19b_video.html"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Watch the “We drank beer” excerpt ↗
+            </a>
+            {playing && (
+              <button onClick={() => setPlaying(false)}>Stop playback</button>
+            )}
+          </div>
+        )}
+      </Html>
     </group>
   );
 }
@@ -316,41 +489,9 @@ function Architecture({ room, last, textVisible }) {
     [plaster, stone],
   );
   const middle = (room.front + room.back) / 2;
-  const half = room.width / 2;
-  const segment = (room.width - 2.4) / 2;
-  const walls = [
-    [
-      [-half, room.height / 2, middle],
-      [0.25, room.height, 12],
-    ],
-    [
-      [half, room.height / 2, middle],
-      [0.25, room.height, 12],
-    ],
-    ...(last
-      ? [
-          [
-            [0, room.height / 2, room.back],
-            [room.width, room.height, 0.25],
-          ],
-        ]
-      : [
-          [
-            [-(1.2 + segment / 2), room.height / 2, room.back],
-            [segment, room.height, 0.25],
-          ],
-          [
-            [1.2 + segment / 2, room.height / 2, room.back],
-            [segment, room.height, 0.25],
-          ],
-          [
-            [0, (room.height + 2.8) / 2, room.back],
-            [2.4, room.height - 2.8, 0.25],
-          ],
-        ]),
-  ];
+  const walls = roomWalls(room);
   return (
-    <group>
+    <group position={[room.x, 0, 0]}>
       {walls.map(([position, size], i) => (
         <mesh key={i} position={position} receiveShadow>
           <boxGeometry args={size} />
@@ -376,7 +517,9 @@ function Architecture({ room, last, textVisible }) {
           </Suspense>
         ) : (
           <meshStandardMaterial
-            color={room.id === 4 ? "#9f8971" : "#c2bbaa"}
+            color={
+              room.id === 1 ? "#101114" : room.id === 4 ? "#9f8971" : "#c2bbaa"
+            }
             roughness={0.48}
             bumpMap={stone}
             bumpScale={0.012}
@@ -389,7 +532,7 @@ function Architecture({ room, last, textVisible }) {
       </mesh>
       <pointLight
         position={[0, room.height - 1, middle]}
-        intensity={room.id === 0 ? 12 : 35}
+        intensity={room.id === 1 ? 5 : room.id === 0 ? 12 : 35}
         distance={14}
         color={room.id === 4 ? "#ffe0af" : "#fff5e5"}
       />
@@ -398,7 +541,7 @@ function Architecture({ room, last, textVisible }) {
         <meshStandardMaterial
           color="#fff8e8"
           emissive="#fff8e8"
-          emissiveIntensity={1}
+          emissiveIntensity={room.id === 1 ? 0.1 : 1}
         />
       </mesh>
       {room.id === 0 && (
@@ -436,22 +579,26 @@ function Architecture({ room, last, textVisible }) {
               <meshStandardMaterial color="#d2ccbf" />
             </mesh>
           ))}
-          {[-half + 0.16, half - 0.16].map((x) => (
-            <mesh key={x} position={[x, 0.12, middle]} receiveShadow>
-              <boxGeometry args={[0.07, 0.24, 12]} />
-              <meshStandardMaterial color="#bdb6a7" roughness={0.65} />
-            </mesh>
-          ))}
-          {[-1.25, 1.25].map((x) => (
-            <mesh key={x} position={[x, 1.4, room.back + 0.08]}>
-              <boxGeometry args={[0.13, 2.8, 0.65]} />
-              <meshStandardMaterial color="#b6b0a2" roughness={0.75} />
-            </mesh>
-          ))}
-          <mesh position={[0, 2.83, room.back + 0.08]}>
-            <boxGeometry args={[2.63, 0.12, 0.65]} />
-            <meshStandardMaterial color="#b6b0a2" />
-          </mesh>
+          {walls
+            .filter(
+              ([position, size]) => Math.abs(position[1] - size[1] / 2) < 0.01,
+            )
+            .map(([position, size], i) => (
+              <mesh
+                key={`baseboard-${i}`}
+                position={[position[0], 0.12, position[2]]}
+                receiveShadow
+              >
+                <boxGeometry
+                  args={[
+                    size[0] === 0.12 ? 0.2 : size[0],
+                    0.24,
+                    size[2] === 0.12 ? 0.2 : size[2],
+                  ]}
+                />
+                <meshStandardMaterial color="#bdb6a7" roughness={0.65} />
+              </mesh>
+            ))}
           {Array.from({ length: 7 }, (_, i) => (
             <mesh
               key={`x${i}`}
@@ -482,44 +629,352 @@ function Architecture({ room, last, textVisible }) {
           center
           occlude
         >
-          <div className={styles.wallTitle}>
+          <div
+            className={styles.wallTitle}
+            style={room.id === 1 ? { color: "#fff" } : undefined}
+          >
             <small>ROOM {room.number}</small>
             <h2>{room.title}</h2>
             <p>
               {last
                 ? "End of the collection · return at your own pace"
-                : "Continue through the doorway →"}
+                : room.doors.right !== undefined
+                  ? "Continue through the doorway on your right →"
+                  : "Continue through the doorway →"}
             </p>
           </div>
         </Html>
       )}
-      {room.id === 0 && (
-        <mesh position={[0, room.height / 2, room.front]}>
-          <boxGeometry args={[room.width, room.height, 0.25]} />
-          <meshStandardMaterial color={room.wall} />
-        </mesh>
-      )}
     </group>
   );
 }
+function SunlitExit() {
+  const [daylight, setDaylight] = useState(() => entranceDaylight());
+  useEffect(() => {
+    const update = () => setDaylight(entranceDaylight());
+    const timer = window.setInterval(update, 30000);
+    window.addEventListener("focus", update);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", update);
+    };
+  }, []);
+  const left = useRef(null);
+  const right = useRef(null);
+  useFrame(({ camera }, dt) => {
+    const near =
+      Math.hypot(
+        camera.position.x - entrance.x,
+        camera.position.z - entrance.front,
+      ) < 2.4;
+    const angle = near ? Math.PI * 0.44 : 0;
+    left.current.rotation.y = MathUtils.damp(
+      left.current.rotation.y,
+      -angle,
+      5,
+      dt,
+    );
+    right.current.rotation.y = MathUtils.damp(
+      right.current.rotation.y,
+      angle,
+      5,
+      dt,
+    );
+  });
+  return (
+    <group position={[0, 0, entrance.front]}>
+      {/* Each leaf is built around a real opening for the narrow glass slit. */}
+      {[-1, 1].map((side) => (
+        <group
+          key={side}
+          ref={side === -1 ? left : right}
+          position={[side * 1.2, 0, 0]}
+        >
+          <group position={[-side * 0.6, 0, 0]}>
+            {[
+              [
+                [0, 0.55, 0],
+                [1.18, 1.1, 0.09],
+              ],
+              [
+                [0, 2.65, 0],
+                [1.18, 0.3, 0.09],
+              ],
+              [
+                [-0.385, 1.8, 0],
+                [0.41, 1.4, 0.09],
+              ],
+              [
+                [0.385, 1.8, 0],
+                [0.41, 1.4, 0.09],
+              ],
+            ].map(([position, size], i) => (
+              <mesh key={i} position={position} castShadow receiveShadow>
+                <boxGeometry args={size} />
+                <meshStandardMaterial
+                  color="#bcb5a6"
+                  roughness={0.6}
+                  metalness={0.15}
+                />
+              </mesh>
+            ))}
+            <mesh position={[0, 1.8, 0]}>
+              <boxGeometry args={[0.36, 1.4, 0.025]} />
+              <meshBasicMaterial color={daylight.sky} toneMapped={false} />
+            </mesh>
+            <mesh position={[-side * 0.35, 1.02, -0.09]}>
+              <boxGeometry args={[0.3, 0.035, 0.07]} />
+              <meshStandardMaterial
+                color="#706b61"
+                metalness={0.8}
+                roughness={0.25}
+              />
+            </mesh>
+          </group>
+        </group>
+      ))}
+      <mesh position={[0, 1.4, 0.45]}>
+        <boxGeometry args={[2.6, 2.9, 0.03]} />
+        <meshBasicMaterial color={daylight.sky} toneMapped={false} />
+      </mesh>
+      <rectAreaLight
+        position={[0, 1.8, -0.15]}
+        width={2.2}
+        height={2.6}
+        intensity={7 * daylight.power}
+        color={daylight.color}
+      />
+      {[-0.6, 0.6].map((x) => (
+        <group key={x}>
+          <spotLight
+            position={[x, 2.4, -0.15]}
+            target-position={[x - 1, 0, -4]}
+            angle={0.25}
+            penumbra={0.8}
+            intensity={22 * daylight.power}
+            color={daylight.color}
+          />
+          <mesh
+            position={[x, 0.012, -daylight.length / 2]}
+            rotation={[-Math.PI / 2, 0, daylight.lean]}
+          >
+            <planeGeometry args={[0.4, daylight.length]} />
+            <meshBasicMaterial
+              color={daylight.color}
+              transparent
+              opacity={0.3 * daylight.power}
+              depthWrite={false}
+            />
+          </mesh>
+        </group>
+      ))}
+      <Html
+        transform
+        position={[0, 3.05, -0.15]}
+        rotation={[0, Math.PI, 0]}
+        distanceFactor={2}
+        center
+      >
+        <span
+          style={{
+            font: "11px Arial, sans-serif",
+            letterSpacing: "0.18em",
+            color: "#4b473f",
+            whiteSpace: "nowrap",
+          }}
+        >
+          EXIT · RETURN TO PORTFOLIO
+        </span>
+      </Html>
+    </group>
+  );
+}
+
+function Entrance() {
+  return (
+    <group position={[entrance.x, 0, 0]}>
+      <SunlitExit />
+      {roomWalls(entrance).map(([position, size], i) => (
+        <mesh key={i} position={position}>
+          <boxGeometry args={size} />
+          <meshStandardMaterial color={entrance.wall} roughness={0.9} />
+        </mesh>
+      ))}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 3]}>
+        <planeGeometry args={[6, 14]} />
+        <meshStandardMaterial color="#b8b09f" roughness={0.7} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 4, 3]}>
+        <planeGeometry args={[6, 14]} />
+        <meshStandardMaterial color={entrance.wall} />
+      </mesh>
+      <rectAreaLight
+        position={[0, 3.55, entrance.back + 1.2]}
+        rotation={[-0.45, 0, 0]}
+        width={3.8}
+        height={0.6}
+        intensity={5}
+        color="#fff5e5"
+      />
+      <Html
+        transform
+        zIndexRange={[10, 0]}
+        position={[0, 2.05, entrance.back + 0.18]}
+        distanceFactor={2.2}
+        center
+        occlude
+      >
+        <article className={styles.wallStatement}>
+          <small>AN EXPLORATION OF LOSS</small>
+          <h2>Museum of Ruins</h2>
+          <Statement />
+          <footer>Rekha Tenjarla</footer>
+        </article>
+      </Html>
+    </group>
+  );
+}
+
+function ExitHall() {
+  return (
+    <group position={[exitHall.x, 0, 0]}>
+      {roomWalls(exitHall).map(([position, size], i) => (
+        <mesh key={i} position={position}>
+          <boxGeometry args={size} />
+          <meshStandardMaterial color={exitHall.wall} roughness={0.9} />
+        </mesh>
+      ))}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -18]}>
+        <planeGeometry args={[6, 4]} />
+        <meshStandardMaterial color="#8f8a7f" roughness={0.9} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 3.1, -18]}>
+        <planeGeometry args={[6, 4]} />
+        <meshStandardMaterial color={exitHall.wall} />
+      </mesh>
+      <pointLight
+        position={[0, 2.6, -18]}
+        intensity={16}
+        distance={9}
+        color="#fff1d9"
+      />
+      <mesh position={[0, 3.04, -18]}>
+        <boxGeometry args={[4, 0.05, 0.2]} />
+        <meshStandardMaterial
+          color="#fff1d9"
+          emissive="#fff1d9"
+          emissiveIntensity={1}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function Passage({ passage: p }) {
+  const plaster = useMemo(() => surfaceTexture(8), []);
+  useEffect(() => () => plaster.dispose(), [plaster]);
+  const height = 3.1;
+  const middle = (p.front + p.back) / 2;
+  const wallSegments = [];
+  for (const [z, opening] of [
+    [p.front, p.from.x],
+    [p.back, p.to.x],
+  ]) {
+    for (const [left, right] of [
+      [p.left, opening - 1.2],
+      [opening + 1.2, p.right],
+    ]) {
+      if (right - left > 0.01)
+        wallSegments.push([
+          [(left + right) / 2, height / 2, z],
+          [right - left, height, 0.2],
+        ]);
+    }
+    wallSegments.push([
+      [opening, 2.95, z],
+      [2.4, 0.3, 0.2],
+    ]);
+  }
+  wallSegments.push(
+    [
+      [p.left, height / 2, middle],
+      [0.2, height, 4],
+    ],
+    [
+      [p.right, height / 2, middle],
+      [0.2, height, 4],
+    ],
+  );
+  return (
+    <group>
+      {wallSegments.map(([position, size], i) => (
+        <mesh key={i} position={position}>
+          <boxGeometry args={size} />
+          <meshStandardMaterial
+            color={p.to.wall}
+            roughness={0.9}
+            bumpMap={plaster}
+            bumpScale={0.018}
+          />
+        </mesh>
+      ))}
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[(p.left + p.right) / 2, 0, middle]}
+      >
+        <planeGeometry args={[p.right - p.left, 4]} />
+        <meshStandardMaterial color="#8f8a7f" roughness={0.9} />
+      </mesh>
+      <mesh
+        rotation={[Math.PI / 2, 0, 0]}
+        position={[(p.left + p.right) / 2, height, middle]}
+      >
+        <planeGeometry args={[p.right - p.left, 4]} />
+        <meshStandardMaterial color={p.to.wall} roughness={0.9} />
+      </mesh>
+      <pointLight
+        position={[(p.left + p.right) / 2, 2.6, middle]}
+        intensity={16}
+        distance={9}
+        color="#fff1d9"
+      />
+      <mesh position={[(p.left + p.right) / 2, 3.04, middle]}>
+        <boxGeometry args={[2, 0.05, 0.2]} />
+        <meshStandardMaterial
+          emissive="#fff1d9"
+          emissiveIntensity={1}
+          color="#fff1d9"
+        />
+      </mesh>
+    </group>
+  );
+}
+
 export default function Room({
   active,
   entered,
   movementRef,
   onSelect,
+  destination,
   onRoomChange,
+  onExit,
 }) {
-  const [visibleRooms, setVisibleRooms] = useState([0]);
+  const [visibleRooms, setVisibleRooms] = useState([]);
   return (
     <Canvas
       shadows
       dpr={[1, 1.5]}
-      camera={{ position: [0, 1.65, 0], fov: 65 }}
+      camera={{ position: [entrance.x, 1.65, 3], rotation: [0, 0, 0], fov: 65 }}
       gl={{ antialias: true }}
     >
       <color attach="background" args={["#c5bfb0"]} />
       <ambientLight intensity={0.35} />
       <hemisphereLight args={["#fff3da", "#777264", 0.65]} />
+      <Entrance />
+      <ExitHall />
+      {passages.map((passage, index) => (
+        <Passage key={index} passage={passage} />
+      ))}
       {rooms.map((room, index) => (
         <Architecture
           key={room.id}
@@ -528,24 +983,30 @@ export default function Room({
           last={index === rooms.length - 1}
         />
       ))}
-      {exhibits.map((item) => (
-        <Exhibit
-          key={item.number}
-          item={item}
-          onSelect={onSelect}
-          textVisible={entered && visibleRooms.includes(item.roomId)}
-        />
-      ))}
+      {exhibits
+        .filter((item) => item.number !== "02.1" && item.roomId !== 0)
+        .map((item) => (
+          <Exhibit
+            key={item.number}
+            item={item}
+            onSelect={onSelect}
+            textVisible={entered && visibleRooms.includes(item.roomId)}
+          />
+        ))}
+      <ClassroomPosters visible={entered && visibleRooms.includes(0)} />
       <Suspense fallback={null}>
-        <SchoolDesk
-          onSelect={onSelect}
-          textVisible={entered && visibleRooms.includes(0)}
-        />
+        <SchoolDesk />
       </Suspense>
+      {entered && visibleRooms.includes(1) && (
+        <HearingScreen visible={active} />
+      )}
       <Navigator
+        entered={entered}
+        destination={destination}
         movementRef={movementRef}
         active={active}
         onRoomChange={onRoomChange}
+        onExit={onExit}
         onVisibleRoomsChange={setVisibleRooms}
       />
     </Canvas>
