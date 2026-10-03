@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="wall" x2="1" y2="0.7"><stop stop-color="#faf6ed"/><stop offset="1" stop-color="#dfd8ca"/></linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#wall)"/>
+  <g fill="#302e29">
+    <text x="82" y="90" font-family="Arial, sans-serif" font-size="15" letter-spacing="4">AN EXPLORATION OF LOSS</text>
+    <text x="76" y="268" font-family="Baskerville, Georgia, serif" font-size="146" letter-spacing="-4">Museum</text>
+    <text x="76" y="407" font-family="Baskerville, Georgia, serif" font-size="146" letter-spacing="-4">of Ruins</text>
+    <text x="84" y="552" font-family="Arial, sans-serif" font-size="15" letter-spacing="3">REKHA TENJARLA</text>
+    <text x="1118" y="552" text-anchor="end" font-family="Arial, sans-serif" font-size="13" letter-spacing="2">AN IMMERSIVE EXHIBITION</text>
+  </g>
+  <path d="M83 485H1117" stroke="#302e29" stroke-opacity=".3"/>
+</svg>

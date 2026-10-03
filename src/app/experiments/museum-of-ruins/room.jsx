@@ -12,7 +12,6 @@ import {
 } from "three";
 
 import {
-  exhibits,
   rooms,
   canWalk,
   deskCluster,
@@ -24,11 +23,15 @@ import {
   exitHall,
 } from "./exhibits";
 import { surfaceTexture } from "./materials";
-import Statement from "./statement";
+import { statementParagraphs } from "./statement";
+import WallText from "./wall-text";
+import Monument from "./monument";
 import { entranceDaylight } from "./daylight";
 import styles from "./museum.module.css";
 
 function Navigator({
+  poseRef,
+  travelRef,
   entered,
   active,
   movementRef,
@@ -129,7 +132,7 @@ function Navigator({
       const { item } = destination;
       const room = rooms[item.roomId];
       let target = item.position || [-2.6, 1, -5];
-      if (item.number === "02.1") target = [room.x - 5.32, 2.6, room.front - 5];
+      if (item.number === "02.1") target = [room.x - 5.32, 2.6, (room.front + room.doors.left + 1.2) / 2];
       // The classroom's original study objects have been replaced by posters.
       if (item.number === "01.1") target = [-5.84, 2.5, -4];
       if (item.number === "01.2") target = [5.84, 2.5, -1.5];
@@ -139,6 +142,14 @@ function Navigator({
       yaw.current = Math.atan2(x - target[0], z - target[2]);
       pitch.current = 0;
       keys.current.clear();
+      drag.current = null;
+    }
+    if (travelRef.current) {
+      const { x, z } = travelRef.current;
+      travelRef.current = null;
+      if (canWalk(x, z)) camera.position.set(x, 1.65, z);
+      keys.current.clear();
+      movementRef.current = { x: 0, y: 0 };
       drag.current = null;
     }
     const k = keys.current,
@@ -180,6 +191,7 @@ function Navigator({
       camera.position.x += dx;
     if (canWalk(camera.position.x, camera.position.z + dz))
       camera.position.z += dz;
+    poseRef.current = { x: camera.position.x, z: camera.position.z, yaw: yaw.current };
     if (
       Math.abs(camera.position.x - entrance.x) < 0.75 &&
       camera.position.z >= entrance.front - 0.08
@@ -187,65 +199,6 @@ function Navigator({
       onExit();
   });
   return null;
-}
-function Exhibit({ item, onSelect, textVisible }) {
-  return (
-    <group position={item.position} rotation={item.rotation}>
-      <mesh castShadow>
-        <boxGeometry args={[3.5, 2.4, 0.12]} />
-        <meshStandardMaterial color="#39362f" />
-      </mesh>
-      <mesh position={[0, 0, 0.075]}>
-        <planeGeometry args={[3.28, 2.18]} />
-        <meshStandardMaterial color={item.color} roughness={1} />
-      </mesh>
-      {Array.from({ length: 7 }, (_, i) => (
-        <mesh
-          key={i}
-          position={[-1.25 + i * 0.39, Math.sin(i * 1.8) * 0.25, 0.09]}
-          rotation={[0, 0, (i - 3) * 0.06]}
-        >
-          <planeGeometry args={[0.025, 1.45 - i * 0.08]} />
-          <meshStandardMaterial color="#c8c3ae" />
-        </mesh>
-      ))}
-      {textVisible && (
-        <Html
-          transform
-          position={[0.8, -1.65, 0.1]}
-          distanceFactor={2.4}
-          center
-          occlude
-        >
-          <button
-            onClick={() => onSelect(item)}
-            style={{
-              background: item.roomId === 1 ? "#111216" : "#eee9de",
-              border: 0,
-              padding: "14px 18px",
-              width: 240,
-              textAlign: "left",
-              color: item.roomId === 1 ? "#fff" : "#292823",
-              cursor: "pointer",
-              fontFamily: "Georgia, serif",
-            }}
-          >
-            <small
-              style={{ fontFamily: "Arial", fontSize: 9, letterSpacing: 2 }}
-            >
-              STUDY OBJECT {item.number}
-            </small>
-            <strong style={{ display: "block", fontSize: 19, marginTop: 7 }}>
-              {item.title}
-            </strong>
-            <span style={{ display: "block", fontSize: 11, marginTop: 8 }}>
-              Read the placard ↗
-            </span>
-          </button>
-        </Html>
-      )}
-    </group>
-  );
 }
 function ClassroomPosters({ visible }) {
   if (!visible) return null;
@@ -380,7 +333,7 @@ function HearingScreen({ visible }) {
   const [playing, setPlaying] = useState(false);
   return (
     <group
-      position={[rooms[1].x - 5.32, 2.6, rooms[1].front - 5]}
+      position={[rooms[1].x - 5.32, 2.6, (rooms[1].front + rooms[1].doors.left + 1.2) / 2]}
       rotation={[0, Math.PI / 2, 0]}
     >
       <mesh>
@@ -621,29 +574,37 @@ function Architecture({ room, last, textVisible }) {
           ))}
         </>
       )}
+      {room.id === 1 && textVisible && (
+        <group position={[room.width / 2 - 0.13, 2.6, -6.7]} rotation={[0, -Math.PI / 2, 0]}>
+          <WallText width={3.8} color="#f3efe7" blocks={[
+            { text: "Their deaths were preventable.", size: 88, gap: 45 },
+            { text: "Amber Nicole Thurman. Candi Miller. Josseli Barnica. Nevaeh Crain. Porsha Ngumezi.", size: 46 },
+            { text: "Georgia’s review committee judged Thurman’s and Miller’s deaths preventable. Medical experts reviewing the Texas cases for ProPublica identified failures in care.", size: 38 },
+          ]} />
+          {[
+            ["Amber Nicole Thurman", "georgia-abortion-ban-amber-thurman-death"],
+            ["Candi Miller", "candi-miller-abortion-ban-death-georgia"],
+            ["Josseli Barnica", "josseli-barnica-death-miscarriage-texas-abortion-ban"],
+            ["Nevaeh Crain", "nevaeh-crain-death-texas-abortion-ban-emtala"],
+            ["Porsha Ngumezi", "porsha-ngumezi-miscarriage-death-texas-abortion-ban"],
+          ].map(([name, slug], index) => (
+            <WallText key={name} position={[0, -1.15 - index * 0.17, 0.005]} width={3.8} color="#c8c1b5"
+              blocks={[{ text: `[${index + 1}] ${name} · ProPublica ↗`, size: 26, sans: true, gap: 0 }]}
+              onClick={(event) => { event.stopPropagation(); window.open(`https://www.propublica.org/article/${slug}`, "_blank", "noopener,noreferrer"); }} />
+          ))}
+        </group>
+      )}
+      {room.id === 1 && textVisible && (
+        <WallText position={[0, 2.35, room.front - 0.13]} rotation={[0, Math.PI, 0]} width={4.3} color="#f3efe7"
+          blocks={[{ text: "the feeling that things are actually worse for us than they were for our mothers...", size: 68 }]} />
+      )}
       {textVisible && (
-        <Html
-          transform
-          position={[0, room.height - 1.2, room.back + 0.16]}
-          distanceFactor={4}
-          center
-          occlude
-        >
-          <div
-            className={styles.wallTitle}
-            style={room.id === 1 ? { color: "#fff" } : undefined}
-          >
-            <small>ROOM {room.number}</small>
-            <h2>{room.title}</h2>
-            <p>
-              {last
-                ? "End of the collection · return at your own pace"
-                : room.doors.right !== undefined
-                  ? "Continue through the doorway on your right →"
-                  : "Continue through the doorway →"}
-            </p>
-          </div>
-        </Html>
+        <WallText position={room.id === 2 ? [room.width / 2 - 0.13, 2.8, room.doors.left] : [0, room.height - 1.2, room.back + 0.13]} rotation={room.id === 2 ? [0, -Math.PI / 2, 0] : [0, 0, 0]} width={room.id === 2 ? 5.2 : 4} color={room.id === 1 ? "#ffffff" : "#302e29"}
+          blocks={[
+            { text: `ROOM ${room.number}`, size: 24, sans: true },
+            { text: room.title, size: room.id === 2 ? 110 : 70, gap: room.id === 2 ? 48 : 28 },
+            { text: last ? "End of the collection · return at your own pace" : room.doors.right !== undefined ? "Continue through the doorway on your right →" : "Continue through the doorway →", size: 25, sans: true },
+          ]} />
       )}
     </group>
   );
@@ -768,24 +729,8 @@ function SunlitExit() {
           </mesh>
         </group>
       ))}
-      <Html
-        transform
-        position={[0, 3.05, -0.15]}
-        rotation={[0, Math.PI, 0]}
-        distanceFactor={2}
-        center
-      >
-        <span
-          style={{
-            font: "11px Arial, sans-serif",
-            letterSpacing: "0.18em",
-            color: "#4b473f",
-            whiteSpace: "nowrap",
-          }}
-        >
-          EXIT · RETURN TO PORTFOLIO
-        </span>
-      </Html>
+      <WallText position={[0, 3.05, -0.15]} rotation={[0, Math.PI, 0]} width={2}
+        blocks={[{ text: "EXIT · RETURN TO PORTFOLIO", size: 52, sans: true, gap: 0 }]} />
     </group>
   );
 }
@@ -816,21 +761,13 @@ function Entrance() {
         intensity={5}
         color="#fff5e5"
       />
-      <Html
-        transform
-        zIndexRange={[10, 0]}
-        position={[0, 2.05, entrance.back + 0.18]}
-        distanceFactor={2.2}
-        center
-        occlude
-      >
-        <article className={styles.wallStatement}>
-          <small>AN EXPLORATION OF LOSS</small>
-          <h2>Museum of Ruins</h2>
-          <Statement />
-          <footer>Rekha Tenjarla</footer>
-        </article>
-      </Html>
+      <WallText position={[0, 2.05, entrance.back + 0.13]} width={3.55}
+        blocks={[
+          { text: "AN EXPLORATION OF LOSS", size: 22, sans: true },
+          { text: "Museum of Ruins", size: 85, gap: 40 },
+          ...statementParagraphs.map((text) => ({ text, size: 40, gap: 35 })),
+          { text: "REKHA TENJARLA", size: 24, sans: true },
+        ]} />
     </group>
   );
 }
@@ -951,10 +888,11 @@ function Passage({ passage: p }) {
 }
 
 export default function Room({
+  poseRef,
+  travelRef,
   active,
   entered,
   movementRef,
-  onSelect,
   destination,
   onRoomChange,
   onExit,
@@ -972,6 +910,7 @@ export default function Room({
       <hemisphereLight args={["#fff3da", "#777264", 0.65]} />
       <Entrance />
       <ExitHall />
+      <Monument />
       {passages.map((passage, index) => (
         <Passage key={index} passage={passage} />
       ))}
@@ -983,16 +922,6 @@ export default function Room({
           last={index === rooms.length - 1}
         />
       ))}
-      {exhibits
-        .filter((item) => item.number !== "02.1" && item.roomId !== 0)
-        .map((item) => (
-          <Exhibit
-            key={item.number}
-            item={item}
-            onSelect={onSelect}
-            textVisible={entered && visibleRooms.includes(item.roomId)}
-          />
-        ))}
       <ClassroomPosters visible={entered && visibleRooms.includes(0)} />
       <Suspense fallback={null}>
         <SchoolDesk />
@@ -1001,6 +930,8 @@ export default function Room({
         <HearingScreen visible={active} />
       )}
       <Navigator
+        poseRef={poseRef}
+        travelRef={travelRef}
         entered={entered}
         destination={destination}
         movementRef={movementRef}

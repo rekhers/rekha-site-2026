@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { exhibits, rooms, classroomDesk } from "./exhibits";
 import styles from "./museum.module.css";
 import Thumbstick from "./thumbstick";
+import Blueprint from "./blueprint";
 const Room = dynamic(() => import("./room"), { ssr: false });
 export default function Museum() {
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function Museum() {
   const [exhibit, setExhibit] = useState(null);
   const [paused, setPaused] = useState(false);
   const dialog = useRef(null);
+  const poseRef = useRef({ x: -9, z: 3, yaw: 0 });
+  const travelRef = useRef(null);
   const movementRef = useRef({ x: 0, y: 0 });
   const modalOpen = paused || Boolean(exhibit);
 
@@ -49,6 +52,8 @@ export default function Museum() {
   return (
     <main className={styles.museum}>
       <Room
+        poseRef={poseRef}
+        travelRef={travelRef}
         destination={destination}
         movementRef={movementRef}
         entered={entered}
@@ -109,6 +114,7 @@ export default function Museum() {
       {entered && !modalOpen && !exiting && (
         <Thumbstick movementRef={movementRef} />
       )}
+      {entered && !modalOpen && !exiting && <Blueprint poseRef={poseRef} travelRef={travelRef} />}
       <dialog
         ref={dialog}
         className={styles.label}

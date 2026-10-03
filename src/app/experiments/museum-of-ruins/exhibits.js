@@ -217,7 +217,14 @@ export const deskCluster = Array.from({ length: 3 }, (_, index) => {
   };
 });
 
+export const roeMonument = {
+  position: [rooms[1].x, 0, (rooms[1].front + rooms[1].back) / 2],
+};
+
 export function canWalk(x, z) {
+  // Rotated base footprint plus visitor clearance.
+  if (Math.abs(x - roeMonument.position[0]) < 1.05 &&
+      Math.abs(z - roeMonument.position[2]) < 1.5) return false;
   if (
     deskCluster.some(
       ({ position }) => Math.hypot(x - position[0], z - position[2]) < 0.85,

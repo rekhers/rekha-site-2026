@@ -608,3 +608,24 @@
     animation: none;
   }
 }
+
+.blueprint { display: none; }
+@media (min-width: 900px) and (pointer: fine) {
+  .blueprint {
+    display: block;
+    position: absolute;
+    z-index: 25;
+    right: 24px;
+    bottom: 90px;
+    width: 280px;
+    padding: 16px;
+    background: rgb(244 240 231 / 94%);
+    color: #454b48;
+    border: 1px solid #787e7466;
+    box-shadow: 0 4px 24px #0002;
+  }
+  .blueprint > div { display: flex; justify-content: space-between; font: 9px/1.5 Arial, sans-serif; }
+  .blueprint strong { letter-spacing: .12em; font-weight: 400; }
+  .blueprint svg { display: block; width: 100%; margin: 10px 0; user-select: none; }
+  .blueprint small { font: 9px/1.7 Arial, sans-serif; opacity: .75; }
+}
