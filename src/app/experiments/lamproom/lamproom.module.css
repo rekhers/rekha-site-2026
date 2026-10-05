@@ -1,0 +1,17 @@
+.room { position: fixed; inset: 0; background: #28231e; color: #f3eadb; }
+.room canvas { touch-action: none; }
+.header { position: absolute; top: 32px; left: 38px; pointer-events: none; }
+.header a { pointer-events: auto; color: inherit; text-decoration: none; font: 11px Arial, sans-serif; opacity: .7; }
+.header h1 { margin: 30px 0 6px; font: 400 clamp(36px, 5vw, 62px)/1.1 Baskerville, Georgia, serif; letter-spacing: -.03em; }
+.header p { font: 12px/1.5 Arial, sans-serif; opacity: .7; }
+.controls { position: absolute; bottom: max(26px, env(safe-area-inset-bottom)); left: 38px; padding: 18px 22px; background: #211c16bd; border: 1px solid #e6d4b824; border-radius: 3px; backdrop-filter: blur(12px); }
+.controls label { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 8px 0; font: 12px Arial, sans-serif; }
+.controls input { accent-color: #d9b786; width: 150px; min-height: 30px; }
+.controls p { margin: 12px 0 0; font: 10px/1.5 Arial, sans-serif; opacity: .6; }
+@media(max-width: 600px) { .header { top: 24px; left: 24px; } .controls { left: 24px; right: 24px; } }
+
+.header h1, .header p { transition: opacity 700ms ease, transform 700ms ease; }
+.header[data-walking="true"] h1, .header[data-walking="true"] p { opacity: 0; transform: translateY(-8px); }
+@media (prefers-reduced-motion: reduce) { .header h1, .header p { transition: none; } }
+
+.controls select { width: 150px; padding: 8px; color: #f3eadb; background: #322b23; border: 1px solid #ad947466; border-radius: 3px; }
